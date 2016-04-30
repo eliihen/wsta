@@ -1,0 +1,9 @@
+[package]
+name = "wsta"
+version = "0.1.0"
+authors = ["Espen Henriksen <dev@henriksen.is>"]
+
+[dependencies]
+argparse = "*"
+websocket = "0.17.0"
+
