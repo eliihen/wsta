@@ -2,6 +2,10 @@
 name = "wsta"
 version = "0.1.0"
 authors = ["Espen Henriksen <dev@henriksen.is>"]
+description = "The WebSocket Transfer Agent"
+
+readme = "README.md"
+license = "GPL-3.0"
 
 [dependencies]
 argparse = "*"
