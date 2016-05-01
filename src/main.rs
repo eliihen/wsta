@@ -44,7 +44,7 @@ fn main() {
 
         ap.refer(&mut options.print_headers)
             .add_option(&["-I", "--head"], StoreTrue,
-                        "(TODO) print HTTP headers");
+                        "print HTTP headers");
 
         ap.refer(&mut options.quiet)
             .add_option(&["-q", "--quiet"], StoreTrue,

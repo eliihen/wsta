@@ -19,6 +19,14 @@ pub fn run_wsta(options: &mut Options) {
     // Send the request
     let response = request.send().unwrap();
 
+    // Dump headers when requested
+    if options.print_headers {
+        println!("WebSocket upgrade request");
+        println!("---");
+        println!("{}", response.status);
+        println!("{}", response.headers);
+    }
+
     // Ensure the response is valid
     // TODO Show error if invalid
     response.validate().unwrap();
