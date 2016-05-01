@@ -6,7 +6,7 @@ use std::io::Write;
 use std::thread;
 use std::time::Duration;
 
-use argparse::{ArgumentParser, Store, StoreTrue};
+use argparse::{ArgumentParser, Store, StoreTrue, Print};
 
 use websocket::{Client, Message, Sender, Receiver};
 use websocket::client::request::Url;
@@ -19,15 +19,25 @@ fn main() {
     {  // this block limits scope of borrows by ap.refer() method
         let mut ap = ArgumentParser::new();
 
+        // TODO NO WORK ap.set_description(env!("CARGO_PKG_DESCRIPTION"));
         ap.set_description("The WebSocket Transfer Agent.");
 
         ap.refer(&mut url)
+            .required()
             .add_option(&["-u", "--url"], Store,
                         "URL of the server to connect with");
 
         ap.refer(&mut quiet)
             .add_option(&["-q", "--quiet"], StoreTrue,
-                        "Only output incoming frames without any decoration");
+                        "only output incoming frames without any decoration");
+
+        ap.add_option(&["-V", "--version"],
+                      Print(format!("{} {}",
+                                    "wsta",
+                                    // TODO NO WORK! env!("CARGO_PKG_NAME"),
+                                    env!("CARGO_PKG_VERSION"))
+                            ),
+                      "print version number and exit");
 
         ap.parse_args_or_exit();
     }
@@ -77,7 +87,7 @@ fn main() {
             Ok(_) => {
 
                 // If stdin is not empty
-                if stdin.trim().len() > 0 {
+                if !stdin.trim().is_empty() {
                     let message = Message::text(stdin.trim());
                     sender.send_message(&message).unwrap();
                 }
