@@ -1,6 +1,7 @@
 use std::io;
 use std::io::Write;
 use std::thread;
+use std::process::exit;
 use std::time::Duration;
 
 use websocket::{Client, Message, Sender, Receiver};
@@ -27,9 +28,19 @@ pub fn run_wsta(options: &mut Options) {
         println!("{}", response.headers);
     }
 
-    // Ensure the response is valid
-    // TODO Show error if invalid
-    response.validate().unwrap();
+    // Ensure the response is valid and show an error if not
+    match response.validate() {
+        Ok(_) => {},
+        Err(error) => {
+            write!(io::stderr(), "{}\n", error).unwrap();
+
+            if !options.print_headers {
+                write!(io::stderr(), "Try -I for more info\n").unwrap();
+            }
+
+            exit(1);
+        }
+    }
 
     // Get a Client
     let client = response.begin();
