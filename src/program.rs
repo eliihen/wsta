@@ -5,7 +5,8 @@ use std::process::exit;
 use std::time::Duration;
 
 use websocket::{Client, Message, Sender, Receiver};
-use websocket::client::request::Url;
+use websocket::client::request::{Request, Url};
+use websocket::stream::WebSocketStream;
 
 use options::Options;
 
@@ -15,14 +16,25 @@ pub fn run_wsta(options: &mut Options) {
     let url = Url::parse(&options.url).unwrap();
 
     // Connect to the server
-    let request = Client::connect(url).unwrap();
+    let mut request = Client::connect(url).unwrap();
+
+    // Add the headers passed from command line arguments
+    if !options.headers.is_empty() {
+        add_headers_to_request(&mut request, &mut options.headers);
+    }
+
+    if options.print_headers {
+        println!("WebSocket upgrade request");
+        println!("---");
+        println!("{}", request.headers);
+    }
 
     // Send the request
     let response = request.send().unwrap();
 
     // Dump headers when requested
     if options.print_headers {
-        println!("WebSocket upgrade request");
+        println!("WebSocket upgrade response");
         println!("---");
         println!("{}", response.status);
         println!("{}", response.headers);
@@ -48,6 +60,7 @@ pub fn run_wsta(options: &mut Options) {
     // Send message
     let (mut sender, mut receiver) = client.split();
 
+    // Clone so thread can own this instance
     let quiet = options.quiet.clone();
 
     // Read incoming messages in separate thread
@@ -75,7 +88,7 @@ pub fn run_wsta(options: &mut Options) {
         match io::stdin().read_line(&mut stdin) {
             Ok(_) => {
 
-                // If stdin is not empty
+                // Only send non-empty lines to server
                 if !stdin.trim().is_empty() {
                     let message = Message::text(stdin.trim());
                     sender.send_message(&message).unwrap();
@@ -87,6 +100,27 @@ pub fn run_wsta(options: &mut Options) {
         // When looping noninteractively, ensure we don't eat the processor
         // Sleep for 0.5 sec
         thread::sleep(Duration::new(0, 500000000));
+    }
+}
+
+fn add_headers_to_request(request: &mut Request<WebSocketStream, WebSocketStream>,
+                          headers: &mut Vec<String>) {
+    for header in headers {
+
+        // Only process the header if it is a valid "key: value" header
+        if header.contains(':') {
+
+            // Split by first colon into [key, value]
+            let split = header.splitn(2, ':').collect::<Vec<&str>>();
+            let key = split[0];
+            let val = split[1].to_string().into_bytes();
+
+            // Write raw (untyped) header
+            request.headers.set_raw(format!("{}", key), vec![val]);
+        } else {
+            write!(io::stderr(),
+            "Invalid header: {}. Must contain a colon (:)\n", header).unwrap();
+        }
     }
 }
 
