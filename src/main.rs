@@ -40,7 +40,7 @@ fn main() {
 
         ap.refer(&mut options.headers)
             .add_option(&["-h", "--header"], Collect,
-                        "(TODO) add headers to any HTTP request made");
+                        "add headers to any HTTP request made");
 
         ap.refer(&mut options.print_headers)
             .add_option(&["-I", "--head"], StoreTrue,
