@@ -1,8 +1,10 @@
 extern crate websocket;
 extern crate argparse;
+extern crate hyper;
 
 mod program;
-pub mod options;
+mod http;
+mod options;
 
 use std::vec::Vec;
 
@@ -36,7 +38,7 @@ fn main() {
 
         ap.refer(&mut options.login_url)
             .add_option(&["-l", "--login"], Store,
-                        "(TODO) URL to authenticate with before connecting to WS");
+                        "URL to authenticate with before connecting to WS");
 
         ap.refer(&mut options.headers)
             .add_option(&["-h", "--header"], Collect,

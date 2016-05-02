@@ -8,6 +8,7 @@ readme = "README.md"
 license = "GPL-3.0"
 
 [dependencies]
-argparse = "*"
+argparse = "0.2.1"
 websocket = "0.17.0"
+hyper = "0.9.1"
 

@@ -9,8 +9,14 @@ use websocket::client::request::{Request, Url};
 use websocket::stream::WebSocketStream;
 
 use options::Options;
+use http::{fetch_session_cookie, print_headers};
 
 pub fn run_wsta(options: &mut Options) {
+
+    // Authenticate if requested
+    if !options.login_url.is_empty() {
+        fetch_session_cookie(options);
+    }
 
     // Get the URL
     let url = Url::parse(&options.url).unwrap();
@@ -24,9 +30,7 @@ pub fn run_wsta(options: &mut Options) {
     }
 
     if options.print_headers {
-        println!("WebSocket upgrade request");
-        println!("---");
-        println!("{}", request.headers);
+        print_headers("WebSocket upgrade request", &request.headers, None);
     }
 
     // Send the request
@@ -34,10 +38,8 @@ pub fn run_wsta(options: &mut Options) {
 
     // Dump headers when requested
     if options.print_headers {
-        println!("WebSocket upgrade response");
-        println!("---");
-        println!("{}", response.status);
-        println!("{}", response.headers);
+        print_headers("WebSocket upgrade response",
+                      &response.headers, Some(response.status));
     }
 
     // Ensure the response is valid and show an error if not

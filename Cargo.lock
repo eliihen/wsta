@@ -3,6 +3,7 @@ name = "wsta"
 version = "0.1.0"
 dependencies = [
  "argparse 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "hyper 0.9.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "websocket 0.17.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
