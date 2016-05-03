@@ -25,6 +25,9 @@ pub fn run_wsta(options: &mut Options) {
 
         if session_cookie.is_some() {
             request.headers.set(session_cookie.unwrap());
+        } else {
+            panic!(concat!("Attempted to fetch session cookie, but no ",
+              ".*session.* cookie was found in response. Inspect -I"));
         }
     }
 
