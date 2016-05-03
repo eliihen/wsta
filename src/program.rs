@@ -13,22 +13,27 @@ use http::{fetch_session_cookie, print_headers};
 
 pub fn run_wsta(options: &mut Options) {
 
-    // Authenticate if requested
-    if !options.login_url.is_empty() {
-        fetch_session_cookie(options);
-    }
-
     // Get the URL
     let url = Url::parse(&options.url).unwrap();
 
     // Connect to the server
     let mut request = Client::connect(url).unwrap();
 
+    // Authenticate if requested
+    if !options.login_url.is_empty() {
+        let session_cookie = fetch_session_cookie(options);
+
+        if session_cookie.is_some() {
+            request.headers.set(session_cookie.unwrap());
+        }
+    }
+
     // Add the headers passed from command line arguments
     if !options.headers.is_empty() {
         add_headers_to_request(&mut request, &mut options.headers);
     }
 
+    // Print request
     if options.print_headers {
         print_headers("WebSocket upgrade request", &request.headers, None);
     }
@@ -44,7 +49,6 @@ pub fn run_wsta(options: &mut Options) {
 
     // Ensure the response is valid and show an error if not
     match response.validate() {
-        Ok(_) => {},
         Err(error) => {
             write!(io::stderr(), "{}\n", error).unwrap();
 
@@ -53,7 +57,8 @@ pub fn run_wsta(options: &mut Options) {
             }
 
             exit(1);
-        }
+        },
+        _ => {}
     }
 
     // Get a Client

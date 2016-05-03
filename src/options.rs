@@ -20,6 +20,10 @@ pub struct Options {
     /// to the main url.
     pub login_url: String,
 
+    /// When passed, this flag will cause the program to follow
+    /// HTTP GET redirection encountered when calling login_url.
+    pub follow_redirect: bool,
+
     /// Print the headers of any HTTP request when true.
     pub print_headers: bool,
 

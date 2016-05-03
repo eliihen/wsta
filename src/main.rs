@@ -1,6 +1,7 @@
 extern crate websocket;
 extern crate argparse;
 extern crate hyper;
+extern crate cookie;
 
 mod program;
 mod http;
@@ -19,6 +20,7 @@ fn main() {
     let mut options = Options {
         url: String::new(),
         login_url: String::new(),
+        follow_redirect: false,
         quiet: false,
         verbosity: 0,
         print_headers: false,
@@ -39,6 +41,10 @@ fn main() {
         ap.refer(&mut options.login_url)
             .add_option(&["-l", "--login"], Store,
                         "URL to authenticate with before connecting to WS");
+
+        ap.refer(&mut options.follow_redirect)
+            .add_option(&["--follow-redirect"], StoreTrue,
+                        "honour HTTP redirection when authenticating");
 
         ap.refer(&mut options.headers)
             .add_option(&["-h", "--header"], Collect,

@@ -1,13 +1,15 @@
+use cookie::Cookie as CookiePair;
+
 use hyper::Client;
 use hyper::Url;
 use hyper::net::{HttpsConnector, Openssl};
-use hyper::header::{Headers, SetCookie, CookieJar};
+use hyper::header::{Headers, SetCookie, Cookie};
 use hyper::status::StatusCode;
-use hyper::client::response::Response;
+use hyper::client::RedirectPolicy;
 
 use options::Options;
 
-pub fn fetch_session_cookie(options: &Options) { // -> Cookie {
+pub fn fetch_session_cookie(options: &Options) -> Option<Cookie> {
 
     // Create a client.
     let mut client = Client::new();
@@ -26,21 +28,22 @@ pub fn fetch_session_cookie(options: &Options) { // -> Cookie {
         client = Client::with_connector(https_connector);
     }
 
+    // Only redirect if requested - otherwise it is really confusing
+    if !options.follow_redirect {
+        client.set_redirect_policy(RedirectPolicy::FollowNone);
+    }
+
     // Create RequestBuilder
-    // TODO Query string is stripped here
-    println!("URL {:?}", &url);
     let request = client.get(url);
 
     // Create and send an outgoing request.
     match request.send() {
         Ok(res) => {
-            println!("{:?}", res);
             if options.print_headers {
                 print_headers("Authenticate response", &res.headers, None);
             }
 
-            extract_cookie(&res.headers);
-            // return extract_cookie(&res.headers);
+            return extract_cookie(&res.headers);
         },
         Err(err) => panic!("Error sending login request: {}", &err)
     }
@@ -59,17 +62,26 @@ pub fn print_headers(title: &str, headers: &Headers,
 }
 
 /// Finds the cookie with name matching .*session.* and returns it
-fn extract_cookie(headers: &Headers) { // -> Cookie {
-    let mut cookie_jar = CookieJar::new(b"d1zbqbctvkuthji4rulxiikq4ctvkuthj");
-    let cookie_header = headers.get::<SetCookie>();
+fn extract_cookie(headers: &Headers) -> Option<Cookie> {
+    let set_cookie_header = headers.get::<SetCookie>();
 
-    println!("{:?}", headers);
-    println!("{:?}", cookie_header);
+    match set_cookie_header {
+        Some(header) => {
+            for cookie in header.as_slice() {
 
-    // SetCookie::apply_to_cookie_jar(cookie_header.unwrap(), &mut cookie_jar);
+                if cookie.name.to_lowercase().contains("session") {
+                    let pair = CookiePair::new(
+                        format!("{}", cookie.name),
+                        format!("{}", cookie.value)
+                    );
 
-    // for cookie in cookie_jar.iter() {
-    //     println!("{}", cookie);
-    // }
+                    return Some(Cookie(vec![pair]));
+                }
+            }
+
+            None
+        },
+        _ => None
+    }
 }
 
