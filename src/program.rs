@@ -7,6 +7,7 @@ use std::time::Duration;
 use websocket::{Client, Message, Sender, Receiver};
 use websocket::client::request::{Request, Url};
 use websocket::stream::WebSocketStream;
+use websocket::result::WebSocketError;
 
 use options::Options;
 use http::{fetch_session_cookie, print_headers};
@@ -17,7 +18,12 @@ pub fn run_wsta(options: &mut Options) {
     let url = Url::parse(&options.url).unwrap();
 
     // Connect to the server
-    let mut request = Client::connect(url).unwrap();
+    let mut request;
+    match Client::connect(url) {
+        Ok(res) => request = res,
+        Err(err) => panic!("An error occured while connecting to {}: {}",
+                           options.url, err)
+    }
 
     // Authenticate if requested
     if !options.login_url.is_empty() {
@@ -76,11 +82,27 @@ pub fn run_wsta(options: &mut Options) {
     // Read incoming messages in separate thread
     thread::spawn(move || {
         for message in receiver.incoming_messages() {
-            if !quiet {
-                print!("< ");
-            }
+            match message {
+                Ok(msg) => {
 
-            println!("{}", message_to_string(message.unwrap()));
+                    if !quiet {
+                        print!("< ");
+                    }
+
+                    println!("{}", message_to_string(msg));
+                },
+                Err(err) => {
+
+                    // Handle the different types of possible errors
+                    match err {
+                        WebSocketError::NoDataAvailable => {
+                            println!("\nDisconnected!");
+                            exit(0);
+                        },
+                        _ => panic!("Error in WebSocket reader: {:?}", err)
+                    }
+                }
+            }
         }
     });
 
