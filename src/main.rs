@@ -23,6 +23,9 @@ extern crate argparse;
 extern crate hyper;
 extern crate cookie;
 
+// Needs to be imported first because of log! macro
+#[macro_use]
+mod log;
 mod program;
 mod http;
 mod options;
@@ -94,6 +97,10 @@ fn main() {
 
         ap.parse_args_or_exit();
     }
+
+    // Set log level, no logging before this is possible
+    log::set_log_level(options.verbosity);
+    log!(3, "Parsed options: {:?}", options);
 
     program::run_wsta(&mut options);
 }

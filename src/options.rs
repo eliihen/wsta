@@ -1,4 +1,5 @@
-/// The command line options provided to the program
+//! The command line options provided to the program
+#[derive(Debug)]
 pub struct Options {
 
     /// Flag the application to be more pipe-friendly.
@@ -7,10 +8,10 @@ pub struct Options {
 
     /// The verbosity level of the application. Should be a number
     /// between 0 and 3.
-    ///   0: NO LOGGING
-    ///   1: EVENT LOGGING
-    ///   2: DEBUG LOGGING
-    /// >=3: TRACE LOGGING
+    /// * 0:   NO LOGGING
+    /// * 1:   ERROR LOGGING
+    /// * 2:   DEBUG LOGGING
+    /// * >=3: TRACE LOGGING
     pub verbosity: u8,
 
     /// The WebSocket URL to connect to.
