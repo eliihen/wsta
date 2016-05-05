@@ -69,7 +69,7 @@ fn main() {
                         "honour HTTP redirection when authenticating");
 
         ap.refer(&mut options.headers)
-            .add_option(&["-h", "--header"], Collect,
+            .add_option(&["-H", "--header"], Collect,
                         "add headers to any HTTP request made");
 
         ap.refer(&mut options.print_headers)
