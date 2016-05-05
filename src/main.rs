@@ -1,3 +1,23 @@
+#![crate_name = "wsta"]
+#![crate_type = "bin"]
+//! `wsta` - The WebSocket Transfer Agent
+//!
+//! Parses command line [options](Options) and connects to a WebSocket server
+//!
+//! # Examples
+//!
+//! Connect to a WebSocket server
+//!
+//! ```bash
+//! wsta -u wss://echo.websocket.org
+//! ```
+//!
+//! # Exit codes
+//! | Code | Reason                                      |
+//! |------|---------------------------------------------|
+//! | 1    | Irrecoverable error during normal operation |
+//! | 2    | Websocket stream was closed unexpectedly    |
+
 extern crate websocket;
 extern crate argparse;
 extern crate hyper;
@@ -13,7 +33,9 @@ use argparse::{ArgumentParser, Store, StoreTrue, Print, Collect, IncrBy};
 
 use options::Options;
 
-/// Parse command line options and invoke program
+/// The main entry point of the app
+///
+/// Parses command line options and start the main program
 fn main() {
 
     // Implement default options
@@ -30,8 +52,8 @@ fn main() {
     {  // this block limits scope of borrows by ap.refer() method
         let mut ap = ArgumentParser::new();
 
-        // TODO NO WORK ap.set_description(env!("CARGO_PKG_DESCRIPTION"));
-        ap.set_description("The WebSocket Transfer Agent");
+        // Requires cargo 0.10 (currently beta)
+        ap.set_description(env!("CARGO_PKG_DESCRIPTION"));
 
         ap.refer(&mut options.url)
             .required()
@@ -64,8 +86,8 @@ fn main() {
 
         ap.add_option(&["-V", "--version"],
                       Print(format!("{} {}",
-                                    "wsta",
-                                    // TODO NO WORK! env!("CARGO_PKG_NAME"),
+                                    // Requires cargo 0.10 (currently beta)
+                                    env!("CARGO_PKG_NAME"),
                                     env!("CARGO_PKG_VERSION"))
                             ),
                       "print version number and exit");
