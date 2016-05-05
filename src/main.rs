@@ -85,7 +85,7 @@ fn main() {
 
         ap.refer(&mut options.verbosity)
             .add_option(&["-v", "--verbose"], IncrBy(1),
-                        "(TODO) increase the verbosity level by one");
+                        "increase the verbosity level by one");
 
         ap.add_option(&["-V", "--version"],
                       Print(format!("{} {}",
