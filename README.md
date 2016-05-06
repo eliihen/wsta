@@ -14,3 +14,7 @@ Run the program
 
     cargo run -- -u ws://echo.websocket.org
 
+In order to generate the man page, `groff` is needed
+
+    make man
+
