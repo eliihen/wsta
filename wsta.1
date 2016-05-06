@@ -1,0 +1,101 @@
+." vim: set spell so=8:
+.TH wsta 1 "6 May 2016" "0.2.0"
+.SH NAME
+wsta \- The WebSocket Transfer Agent
+.SH SYNOPSIS
+.B wsta
+.RI [ OPTIONS ]
+.RI [ MESSAGES ... ]
+
+.SH DESCRIPTION
+.B wsta
+is a program made with the philosophy that developing for WebSockets need not be
+hard. It therefore gets out of your way and lets you do your unix magic in
+peace.
+.B wsta
+provides the tools to work efficiently with websockets, from piping messages
+directly to the server, and then piping the output into neat UNIX utils. Thus
+you are able to use it in a variety of tasks, from development to monitoring of
+system uptime.
+
+.SH RETURN VALUES
+.B wsta
+will return exit code 0 if you cancel the connection manually. If fatal errors
+during normal operations were encountered, it will return 1. If the connection
+with the server was unexpectedly disconnected, it will return 2.
+
+.SH OPTIONS
+
+.TP
+.B -u, --url URL
+The URL to connect to of the format
+.B ws[s]://example.com. This a required parameter.
+.TP
+.B -l, --login URL
+Passing this parameter will make
+.B wsta
+send an HTTP GET request before connecting to the WebSocket. This request is
+expected to be a login URL, which returns a
+.B Set-Cookie
+header containing some sort of session cookie. This cookie is the extracted and
+placed into the WebSocket request. Using this method,
+.B wsta
+can connect to WebSockets behind a login.
+.TP
+.B --follow-redirect
+Related to the
+.B --login
+option above, this request will change the default behavior. By default
+.B --login
+will not follow HTTP redirects. But if provided with the
+.B --follow-redirect
+option
+.B wsta
+will honour any redirects the server requests.
+.TP
+.B -H, --header HEADER
+This option will add a custom header to the WebSocket request. This can be any
+HTTP header and value, as well as custom ones. The input is expected to be in
+the format of
+.B key:value.
+If this format is not encountered, the header will not be added.
+.TP
+.B -I, --head
+Print the headers of requests and responses that are sent to stdout, including
+any and all headers of said requests. This is very useful for debugging why
+.B wsta
+is not able to connect to a server, as you will see the response code it sent.
+.TP
+.B -v, --verbose
+Make
+.B wsta
+more verbose. This option will print varying levels of output to stdout. It can
+be provided up to three times in order to log more verbose output. The first
+level will mostly just tell you which step
+.B wsta
+is currently executing and provide more detailed error reports. The two other
+options are for debugging purposes.
+.TP
+.TP
+.B -V, --version
+Show the installed version of
+.B wsta.
+.B -h, --help
+Show a help message with all the supported input parameters.
+
+.SH BUGS
+When submitting bugs, please provide as verbose output as possible. This can be
+done using a combination og
+.B -vvv
+and
+.B -I.
+Please also provide the output of
+.B wsta --version.
+You should also provide a public server which you can consistently reproduce
+your issue against. If the only server you can reproduce against is private,
+feel free to send a pull request with a fix, as I will probably not be able to
+help you.
+
+Bugs can be submitted at
+.B https://github.com/esphen/wsta/issues.
+
