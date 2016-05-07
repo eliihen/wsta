@@ -27,6 +27,11 @@ done using stdin, or
 arguments (see
 .B ARGUMENTS
 for more info).
+.B wsta
+does not print outgoing frames by default. This is to be as pipe-friendly as
+possible. If you wish to see outgoing frames, the
+.B -e
+option may be for you.
 
 .SH RETURN VALUES
 .B wsta
@@ -61,6 +66,17 @@ Print the headers of requests and responses that are sent to stdout, including
 any and all headers of said requests. This is very useful for debugging why
 .B wsta
 is not able to connect to a server, as you will see the response code it sent.
+
+.TP
+.B -e, --echo
+By default,
+.B wsta
+does not echo outgoing frames. This is to be as pipe-friendly as possible. By
+providing the
+.B -e
+options, you can tell
+.B wsta
+to echo outgoing frames to stdout as well.
 
 .TP
 .B -l, --login URL
@@ -100,9 +116,12 @@ options are for debugging purposes.
 .TP
 .B -V, --version
 Show the installed version of
-.B wsta.
+.B wsta,
+then exits.
+
+.TP
 .B -h, --help
-Show a help message with all the supported input parameters.
+Shows a helpful message containing all supported input parameters, then exits.
 
 .SH EXAMPLES
 
