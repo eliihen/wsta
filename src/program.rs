@@ -5,6 +5,7 @@ use std::process::exit;
 use std::time::Duration;
 
 use websocket::{Client, Message, Sender, Receiver};
+use websocket::client::Sender as SenderObj;
 use websocket::client::request::{Request, Url};
 use websocket::stream::WebSocketStream;
 use websocket::result::WebSocketError;
@@ -70,16 +71,16 @@ pub fn run_wsta(options: &mut Options) {
     // Ensure the response is valid and show an error if not
     match response.validate() {
         Err(error) => {
-            log!(1, "Invalid reponse!");
-            write!(io::stderr(), "{}\n", error).unwrap();
+            log!(1, "Invalid reponse: {:?}", error);
+            stderr!("{}", error);
 
             if !options.print_headers {
-                write!(io::stderr(), "Try -I for more info\n").unwrap();
+                stderr!("Try -I for more info");
             }
 
             exit(1);
         },
-        _ => log!(3, "Response valid")
+        _ => stderr!("Connected to {}", options.url)
     }
 
     // Get a Client
@@ -89,8 +90,10 @@ pub fn run_wsta(options: &mut Options) {
     // Send message
     let (mut sender, mut receiver) = client.split();
 
-    // Clone so thread can own this instance
-    let quiet = options.quiet.clone();
+    // Send pre-provided messages if preesnt
+    if !options.messages.is_empty() {
+        send_messages(&mut sender, &mut options.messages, options.echo);
+    }
 
     // Read incoming messages in separate thread
     thread::spawn(move || {
@@ -99,11 +102,6 @@ pub fn run_wsta(options: &mut Options) {
         for message in receiver.incoming_messages() {
             match message {
                 Ok(msg) => {
-
-                    if !quiet {
-                        print!("< ");
-                    }
-
                     println!("{}", message_to_string(msg));
                 },
                 Err(err) => {
@@ -130,18 +128,18 @@ pub fn run_wsta(options: &mut Options) {
     loop {
         let mut stdin = String::new();
 
-        // Create prompt when interactive
-        if !options.quiet {
-            print!("> ");
-            io::stdout().flush().unwrap();
-        }
-
         // Will block until a stdin-line is read
         match io::stdin().read_line(&mut stdin) {
             Ok(_) => {
 
                 // Only send non-empty lines to server
                 if !stdin.trim().is_empty() {
+
+                    // Print when ehco is active
+                    if options.echo {
+                        print!("> {}", stdin.trim());
+                    }
+
                     let message = Message::text(stdin.trim());
                     sender.send_message(&message).unwrap();
                 }
@@ -178,9 +176,22 @@ fn add_headers_to_request(request: &mut Request<WebSocketStream, WebSocketStream
             request.headers.set_raw(format!("{}", key), vec![val]);
             log!(2, "Wrote new header. Headers are now: {:?}", request.headers);
         } else {
-            write!(io::stderr(),
-            "Invalid header: {}. Must contain a colon (:)\n", header).unwrap();
+            stderr!("Invalid header: {}. Must contain a colon (:)", header);
         }
+    }
+}
+
+fn send_messages(sender: &mut SenderObj<WebSocketStream>,
+                 messages: &mut Vec<String>,
+                 echo: bool) {
+
+    for message in messages {
+        if echo {
+            println!("> {}", message);
+        }
+
+        let frame = Message::text(message.as_str());
+        sender.send_message(&frame).unwrap();
     }
 }
 

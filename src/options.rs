@@ -2,10 +2,6 @@
 #[derive(Debug)]
 pub struct Options {
 
-    /// Flag the application to be more pipe-friendly.
-    /// Only print the incoming websocket frames.
-    pub quiet: bool,
-
     /// The verbosity level of the application. Should be a number
     /// between 0 and 3.
     /// * 0:   NO LOGGING
@@ -25,10 +21,17 @@ pub struct Options {
     /// HTTP GET redirection encountered when calling login_url.
     pub follow_redirect: bool,
 
+    /// Echo outgoing frames, as well as the incoming frames. Outgoing
+    /// frames will be prefixed with ">".
+    pub echo: bool,
+
     /// Print the headers of any HTTP request when true.
     pub print_headers: bool,
 
     /// Headers
-    pub headers: Vec<String>
+    pub headers: Vec<String>,
+
+    /// Messages to send after connecting to the server
+    pub messages: Vec<String>
 }
 

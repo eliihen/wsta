@@ -21,6 +21,12 @@ macro_rules! log {
     }};
 }
 
+macro_rules! stderr {
+    ( $( $msg:tt )* ) => {{
+        writeln!(io::stderr(), $($msg)*).unwrap();
+    }}
+}
+
 /// Sets the log level of the application. See `Options::verbosity` for
 /// more info.
 pub fn set_log_level(level: u8) {

@@ -46,10 +46,11 @@ fn main() {
         url: String::new(),
         login_url: String::new(),
         follow_redirect: false,
-        quiet: false,
+        echo: false,
         verbosity: 0,
         print_headers: false,
-        headers: Vec::new()
+        headers: Vec::new(),
+        messages: Vec::new(),
     };
 
     {  // this block limits scope of borrows by ap.refer() method
@@ -60,7 +61,7 @@ fn main() {
 
         ap.refer(&mut options.url)
             .required()
-            .add_option(&["-u", "--url"], Store,
+            .add_argument("url", Store,
                         "URL of the server to connect with");
 
         ap.refer(&mut options.login_url)
@@ -79,9 +80,9 @@ fn main() {
             .add_option(&["-I", "--head"], StoreTrue,
                         "print HTTP headers");
 
-        ap.refer(&mut options.quiet)
-            .add_option(&["-q", "--quiet"], StoreTrue,
-                        "only output incoming frames without any decoration");
+        ap.refer(&mut options.echo)
+            .add_option(&["-e", "--echo"], StoreTrue,
+                        "echo outgoing frames");
 
         ap.refer(&mut options.verbosity)
             .add_option(&["-v", "--verbose"], IncrBy(1),
@@ -94,6 +95,10 @@ fn main() {
                                     env!("CARGO_PKG_VERSION"))
                             ),
                       "print version number and exit");
+
+        ap.refer(&mut options.messages)
+            .add_argument("messages", Collect,
+                          r#"message(s) to send after connecting"#);
 
         ap.parse_args_or_exit();
     }
