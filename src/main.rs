@@ -28,11 +28,12 @@ extern crate cookie;
 mod log;
 mod program;
 mod http;
+mod ws;
 mod options;
 
 use std::vec::Vec;
 
-use argparse::{ArgumentParser, Store, StoreTrue, Print, Collect, IncrBy};
+use argparse::*;
 
 use options::Options;
 
@@ -51,6 +52,7 @@ fn main() {
         print_headers: false,
         headers: Vec::new(),
         messages: Vec::new(),
+        ping_interval: None
     };
 
     {  // this block limits scope of borrows by ap.refer() method
@@ -64,14 +66,6 @@ fn main() {
             .add_argument("url", Store,
                         "URL of the server to connect with");
 
-        ap.refer(&mut options.login_url)
-            .add_option(&["-l", "--login"], Store,
-                        "URL to authenticate with before connecting to WS");
-
-        ap.refer(&mut options.follow_redirect)
-            .add_option(&["--follow-redirect"], StoreTrue,
-                        "honour HTTP redirection when authenticating");
-
         ap.refer(&mut options.headers)
             .add_option(&["-H", "--header"], Collect,
                         "add headers to any HTTP request made");
@@ -79,6 +73,19 @@ fn main() {
         ap.refer(&mut options.print_headers)
             .add_option(&["-I", "--head"], StoreTrue,
                         "print HTTP headers");
+
+        ap.refer(&mut options.ping_interval)
+            .metavar("SECONDS")
+            .add_option(&["-p", "--ping"], StoreOption,
+                        "specify an interval to send `ping` to the server");
+
+        ap.refer(&mut options.login_url)
+            .add_option(&["-l", "--login"], Store,
+                        "URL to authenticate with before connecting to WS");
+
+        ap.refer(&mut options.follow_redirect)
+            .add_option(&["--follow-redirect"], StoreTrue,
+                        "honour HTTP redirection when authenticating");
 
         ap.refer(&mut options.echo)
             .add_option(&["-e", "--echo"], StoreTrue,

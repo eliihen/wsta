@@ -32,6 +32,10 @@ pub struct Options {
     pub headers: Vec<String>,
 
     /// Messages to send after connecting to the server
-    pub messages: Vec<String>
+    pub messages: Vec<String>,
+
+    /// If provided, will specify an interval for wsta to send a ping
+    /// frame to the server.
+    pub ping_interval: Option<u64>
 }
 

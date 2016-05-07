@@ -1,8 +1,9 @@
 use std::io;
 use std::io::Write;
+use std::sync::{Arc, Mutex};
 use std::thread;
 use std::process::exit;
-use std::time::Duration;
+use std::time::{SystemTime, Duration};
 
 use websocket::{Client, Message, Sender, Receiver};
 use websocket::client::Sender as SenderObj;
@@ -11,6 +12,7 @@ use websocket::stream::WebSocketStream;
 use websocket::result::WebSocketError;
 
 use log;
+use ws;
 use options::Options;
 use http::{fetch_session_cookie, print_headers};
 
@@ -123,33 +125,28 @@ pub fn run_wsta(options: &mut Options) {
         }
     });
 
-    // Main loop on stdin
+    // Share mutable data between writer thread and main thread
+    // using a lockable Mutex.
+    // Mutex will block threads waiting for the lock to become available
+    let stdin_buffer = ws::spawn_stdin_reader::<Arc<Mutex<Vec<String>>>>(options.echo);
+
+    // Variables for checking against a ping interval
+    let ping_interval = options.ping_interval.map(|i| Duration::from_secs(i));
+    let mut last_time = SystemTime::now();
+
     log!(3, "Entering main loop");
     loop {
-        let mut stdin = String::new();
 
-        // Will block until a stdin-line is read
-        match io::stdin().read_line(&mut stdin) {
-            Ok(_) => {
+        // Read buffer, and send message to server if buffer contains anything
+        ws::read_stdin_buffer(&mut sender, stdin_buffer.clone());
 
-                // Only send non-empty lines to server
-                if !stdin.trim().is_empty() {
+        // Check if ping_interval has passed, if so, send a ping frame
+        last_time = ws::check_ping_interval(&ping_interval, last_time,
+                                            &mut sender, options.echo);
 
-                    // Print when ehco is active
-                    if options.echo {
-                        print!("> {}", stdin.trim());
-                    }
-
-                    let message = Message::text(stdin.trim());
-                    sender.send_message(&message).unwrap();
-                }
-            },
-            Err(error) => println!("error: {}", error)
-        }
-
-        // When looping noninteractively, ensure we don't eat the processor
-        // Sleep for 0.5 sec
-        thread::sleep(Duration::new(0, 500000000));
+        // Sleep for a second at a time, as this is the smallest possible
+        // ping_interval that can be input
+        thread::sleep(Duration::from_secs(1));
     }
 }
 
