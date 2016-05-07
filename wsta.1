@@ -68,6 +68,14 @@ any and all headers of said requests. This is very useful for debugging why
 is not able to connect to a server, as you will see the response code it sent.
 
 .TP
+.B -p, --ping SECONDS
+Send "ping" frames to the server every
+.B SECONDS
+seconds. This is helpful if you want to have a an automated script with a
+constant connection to the server without getting disconnected, for example to
+monitor uptime.
+
+.TP
 .B -e, --echo
 By default,
 .B wsta
@@ -145,9 +153,9 @@ and
 Please also provide the output of
 .B wsta --version.
 You should also provide a public server which you can consistently reproduce
-your issue against. If the only server you can reproduce against is private,
-feel free to send a pull request with a fix, as I will probably not be able to
-help you.
+your issue against, as well as the exact word-for-word command which reproduces
+the issue. If the only server you can reproduce against is private, feel free to
+send a pull request with a fix, as I will likely not be able to help you.
 
 Bugs can be submitted at
 .B https://github.com/esphen/wsta/issues.
