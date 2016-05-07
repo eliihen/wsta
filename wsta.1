@@ -1,11 +1,12 @@
 ." vim: set spell so=8:
-.TH wsta 1 "6 May 2016" "0.2.0"
+.TH wsta 1 "7 May 2016" "0.2.0"
 .SH NAME
 wsta \- The WebSocket Transfer Agent
 .SH SYNOPSIS
 .B wsta
 .RI [ OPTIONS ]
-.RI [ MESSAGES ... ]
+.RI URL
+.RI [ MESSAGES ...]
 
 .SH DESCRIPTION
 .B wsta
@@ -18,18 +19,49 @@ directly to the server, and then piping the output into neat UNIX utils. Thus
 you are able to use it in a variety of tasks, from development to monitoring of
 system uptime.
 
+.SH USAGE
+Specify a URL to connect to a server, any output will then start streaming from
+the server to stdout. If you need to send a message to the server, this can be
+done using stdin, or
+.B MESSAGES
+arguments (see
+.B ARGUMENTS
+for more info).
+
 .SH RETURN VALUES
 .B wsta
 will return exit code 0 if you cancel the connection manually. If fatal errors
 during normal operations were encountered, it will return 1. If the connection
 with the server was unexpectedly disconnected, it will return 2.
 
+.SH ARGUMENTS
+
+.TP
+.B URL
+The URL to connect to in the format
+.B ws[s]://example.com. This a required argument.
+
+.TP
+.B MESSAGES
+The messages to send to the server after connection has been established.
+
 .SH OPTIONS
 
 .TP
-.B -u, --url URL
-The URL to connect to of the format
-.B ws[s]://example.com. This a required parameter.
+.B -H, --header HEADER
+This option will add a custom header to the WebSocket request. This can be any
+HTTP header and value, as well as custom ones. The input is expected to be in
+the format of
+.B key:value.
+If this format is not encountered, the header will not be added.
+
+.TP
+.B -I, --head
+Print the headers of requests and responses that are sent to stdout, including
+any and all headers of said requests. This is very useful for debugging why
+.B wsta
+is not able to connect to a server, as you will see the response code it sent.
+
 .TP
 .B -l, --login URL
 Passing this parameter will make
@@ -41,6 +73,7 @@ header containing some sort of session cookie. This cookie is the extracted and
 placed into the WebSocket request. Using this method,
 .B wsta
 can connect to WebSockets behind a login.
+
 .TP
 .B --follow-redirect
 Related to the
@@ -52,19 +85,7 @@ will not follow HTTP redirects. But if provided with the
 option
 .B wsta
 will honour any redirects the server requests.
-.TP
-.B -H, --header HEADER
-This option will add a custom header to the WebSocket request. This can be any
-HTTP header and value, as well as custom ones. The input is expected to be in
-the format of
-.B key:value.
-If this format is not encountered, the header will not be added.
-.TP
-.B -I, --head
-Print the headers of requests and responses that are sent to stdout, including
-any and all headers of said requests. This is very useful for debugging why
-.B wsta
-is not able to connect to a server, as you will see the response code it sent.
+
 .TP
 .B -v, --verbose
 Make
@@ -75,13 +96,26 @@ level will mostly just tell you which step
 .B wsta
 is currently executing and provide more detailed error reports. The two other
 options are for debugging purposes.
-.TP
+
 .TP
 .B -V, --version
 Show the installed version of
 .B wsta.
 .B -h, --help
 Show a help message with all the supported input parameters.
+
+.SH EXAMPLES
+
+.TP
+.B wsta ws://echo.websocket.org ping
+Send a ping frame to a server and see the response printed to stdout.
+
+.TP
+.B wsta -I -v ws://test.example.com
+Show more information about an error, as well as any headers send and received.
+In this case we can see "failed to lookup address", which means it is an invalid
+URL.
+
 
 .SH BUGS
 When submitting bugs, please provide as verbose output as possible. This can be
