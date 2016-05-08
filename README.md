@@ -57,6 +57,58 @@ while true; do
 done
 ```
 
+## Installation
+
+### Requirements
+
+Currently the only requirement to run `wsta` is openssl. If you get an error
+about a missing `ssllib.so` or similar, search your package manager for openssl
+or similar to add this library.
+
+### Fedora
+You run Fedora? You're in luck! I've set up a download page here that you can
+get `wsta` from
+
+https://software.opensuse.org/download.html?project=home%3Aesphen&package=wsta
+
+I'm working on getting more distributions into the Open Build Service pipeline,
+which is what creates the releases on that page. For now, you need Fedora to use
+that page. If you don't use Fedora, have a look below at other options.
+
+### Other 64-bit Linux distributions
+I only have 64-bit Linux machines available to create binaries with, but if you
+have a 64-bit Linux machine, I do provide the binary in every release here on
+GitHub. Have a look at the most recent release, and place the attached binary
+into your `$PATH`.
+
+https://github.com/esphen/wsta/releases
+
+### Compile it yourself
+
+DON'T PANIC. It's really easy to compile and install `wsta` yourself! Rust
+provides solid tools like `cargo` for automating the compilation. If you compile
+`wsta` yourself, it should run on all of
+[rust's supported platforms](https://doc.rust-lang.org/book/getting-started.html#platform-support).
+I have only tested Linux, however, so YMMV.
+
+    # Install the rust language and tools
+    curl -sSf https://static.rust-lang.org/rustup.sh | sh -s -- --channel=beta
+
+    # Install required libraries, using your distribution's package manager
+    dnf install -y gcc openssl-devel
+
+    # Clone the git repository
+    mkdir -p ~/workspace
+    cd ~/workspace
+    git clone https://github.com/esphen/wsta.git
+    cd wsta
+
+    # Finally: compile and install it to your system
+    sudo cargo install --root /usr/local
+
+    # This will create a file called .crates.toml. You can delete it if you want
+    sudo rm /usr/local/.crates.toml
+
 ## Development setup
 
 [Install the rust language and
