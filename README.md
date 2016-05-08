@@ -12,7 +12,7 @@ We use some cargo environment variables that are beta features (cargo 0.10).
 
 Run the program
 
-    cargo run -- -u ws://echo.websocket.org
+    cargo run -- -vvv -I -e ws://echo.websocket.org
 
 In order to generate the man page, `groff` is needed
 
