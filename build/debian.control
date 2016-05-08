@@ -1,0 +1,18 @@
+Source: wsta
+Section: main/devel
+Priority: optional
+Maintainer: Espen Henriksen <dev+wsta@henriksen.is>
+Build-Depends: debhelper (>= 4.1.16), libssl-dev (>= 1), gcc (>= 4)
+
+Package: wsta
+Architecture: any
+Depends: openssl (>= 1)
+Description: wsta is a cli developer tool for WebSockets
+
+# Open Build Service magic
+DEBTRANSFORM-RELEASE: 1
+DEBTRANSFORM-TAR: 0.1.0.tar.gz
+DEBTRANSFORM-FILES-TAR
+DEBTRANSFORM-SERIES
+
+
