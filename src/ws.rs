@@ -54,7 +54,7 @@ pub fn spawn_stdin_reader<A: 'static>(echo: bool) -> Arc<Mutex<Vec<String>>> {
 
             // When looping noninteractively, sleep for a little bit to
             // ensure we don't eat the processor
-            thread::sleep(Duration::new(0, 500000000));
+            thread::sleep(Duration::new(0, 5000));
         }
     });
 
