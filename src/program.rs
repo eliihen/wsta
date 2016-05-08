@@ -5,11 +5,11 @@ use std::thread;
 use std::process::exit;
 use std::time::{SystemTime, Duration};
 
-use websocket::{Client, Message, Sender, Receiver};
+use websocket::{Client, Message, Sender};
 use websocket::client::Sender as SenderObj;
+use websocket::client::Receiver as ReceiverObj;
 use websocket::client::request::{Request, Url};
 use websocket::stream::WebSocketStream;
-use websocket::result::WebSocketError;
 
 use log;
 use ws;
@@ -90,40 +90,14 @@ pub fn run_wsta(options: &mut Options) {
     log!(3, "Client created");
 
     // Send message
-    let (mut sender, mut receiver) = client.split();
+    let (mut sender, receiver) = client.split();
 
     // Send pre-provided messages if preesnt
     if !options.messages.is_empty() {
         send_messages(&mut sender, &mut options.messages, options.echo);
     }
 
-    // Read incoming messages in separate thread
-    thread::spawn(move || {
-        log!(3, "Reader thread spawned");
-
-        for message in receiver.incoming_messages() {
-            match message {
-                Ok(msg) => {
-                    println!("{}", message_to_string(msg));
-                },
-                Err(err) => {
-
-                    // Handle the different types of possible errors
-                    match err {
-                        WebSocketError::NoDataAvailable => {
-                            println!("\nDisconnected!");
-                            log!(1, "Error: {:?}", err);
-                            exit(0);
-                        },
-                        _ => {
-                            log!(1, "Error: {:?}", err);
-                            panic!("Error in WebSocket reader: {}", err);
-                        }
-                    }
-                }
-            }
-        }
-    });
+    ws::spawn_websocket_reader::<ReceiverObj<WebSocketStream>>(receiver);
 
     // Share mutable data between writer thread and main thread
     // using a lockable Mutex.
@@ -190,11 +164,5 @@ fn send_messages(sender: &mut SenderObj<WebSocketStream>,
         let frame = Message::text(message.as_str());
         sender.send_message(&frame).unwrap();
     }
-}
-
-fn message_to_string<'a>(message: Message) -> String {
-    let owned = message.payload.into_owned();
-
-    return String::from_utf8(owned).unwrap();
 }
 

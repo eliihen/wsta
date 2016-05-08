@@ -1,21 +1,34 @@
 use std::io;
 use std::sync::{Arc, Mutex};
 use std::thread;
+use std::process::exit;
 use std::time::{SystemTime, Duration};
 
-use websocket::{Message, Sender};
+use websocket::{Message, Sender, Receiver};
 use websocket::client::Sender as SenderObj;
+use websocket::client::Receiver as ReceiverObj;
 use websocket::stream::WebSocketStream;
+use websocket::result::WebSocketError;
 
 use log;
 
-// Static lifetime so the thread does not outlive the function that owns it
+/// Spawn a thread to read stdin. This must be done in a thread because reading
+/// io is a blocking action, and thus the thread reading stdin cannot be the
+/// same thread as the one sending WebSocket messages.
+///
+/// State is shared with the thread sending WebSocket messages using lockable
+/// shared mutable state - a Mutex.
+///
+/// Function has a static lifetime so the thread does not outlive the function
+/// that owns it.
 pub fn spawn_stdin_reader<A: 'static>(echo: bool) -> Arc<Mutex<Vec<String>>> {
 
     let arc = Arc::new(Mutex::new(Vec::<String>::new()));
     let stdin_buffer = arc.clone();
 
     thread::spawn(move || {
+        log!(3, "stdin reader thread spawned");
+
         loop {
             let mut stdin = String::new();
 
@@ -46,6 +59,39 @@ pub fn spawn_stdin_reader<A: 'static>(echo: bool) -> Arc<Mutex<Vec<String>>> {
     });
 
     arc
+}
+
+/// Read incoming messages in a separate thread and write them to stdout.
+/// Function has a static lifetime and ownership of the Receiver is moved
+/// to the spawned thread
+pub fn spawn_websocket_reader<A: 'static>(mut receiver: ReceiverObj<WebSocketStream>) {
+
+    thread::spawn(move || {
+        log!(3, "WebSocket reader thread spawned");
+
+        for message in receiver.incoming_messages() {
+            match message {
+                Ok(msg) => {
+                    println!("{}", message_to_string(msg));
+                },
+                Err(err) => {
+
+                    // Handle the different types of possible errors
+                    match err {
+                        WebSocketError::NoDataAvailable => {
+                            println!("\nDisconnected!");
+                            log!(1, "Error: {:?}", err);
+                            exit(0);
+                        },
+                        _ => {
+                            log!(1, "Error: {:?}", err);
+                            panic!("Error in WebSocket reader: {}", err);
+                        }
+                    }
+                }
+            }
+        }
+    });
 }
 
 /// Reads the `stdin_buffer` and sends the message using the provided
@@ -93,3 +139,10 @@ pub fn check_ping_interval(ping_interval: &Option<Duration>,
 
     last_time
 }
+
+fn message_to_string<'a>(message: Message) -> String {
+    let owned = message.payload.into_owned();
+
+    return String::from_utf8(owned).unwrap();
+}
+
