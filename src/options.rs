@@ -1,4 +1,6 @@
 //! The command line options provided to the program
+use std::vec::Vec;
+
 #[derive(Debug)]
 pub struct Options {
 
@@ -39,3 +41,18 @@ pub struct Options {
     pub ping_interval: Option<u64>
 }
 
+impl Options {
+    pub fn new() -> Options {
+        Options {
+            url: String::new(),
+            login_url: String::new(),
+            follow_redirect: false,
+            echo: false,
+            verbosity: 0,
+            print_headers: false,
+            headers: Vec::new(),
+            messages: Vec::new(),
+            ping_interval: None
+        }
+    }
+}
