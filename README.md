@@ -75,6 +75,13 @@ I'm working on getting more distributions into the Open Build Service pipeline,
 which is what creates the releases on that page. For now, you need Fedora to use
 that page. If you don't use Fedora, have a look below at other options.
 
+### Mac OS X
+To install on Max OS X, ensure you have [homebrew](http://brew.sh) installed,
+then run the following commands. It's going to take a while, please be patient.
+
+    brew tap esphen/wsta https://github.com/esphen/wsta.git
+    brew install wsta
+
 ### Other 64-bit Linux distributions
 I only have 64-bit Linux machines available to create binaries with, but if you
 have a 64-bit Linux machine, I do provide the binary in every release here on
