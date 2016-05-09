@@ -4,3 +4,6 @@ install:
 
 man:
 	groff -man -Tascii ./wsta.1 | less
+
+wsta.md: wsta.1
+	groff -man -Tascii ./wsta.1 | col -bx | sed 's/^[A-Z]/## &/g' | sed '/wsta(1)/d' > wsta.md
