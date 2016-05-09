@@ -31,8 +31,6 @@ mod http;
 mod ws;
 mod options;
 
-use std::vec::Vec;
-
 use argparse::*;
 
 use options::Options;
@@ -43,17 +41,7 @@ use options::Options;
 fn main() {
 
     // Implement default options
-    let mut options = Options {
-        url: String::new(),
-        login_url: String::new(),
-        follow_redirect: false,
-        echo: false,
-        verbosity: 0,
-        print_headers: false,
-        headers: Vec::new(),
-        messages: Vec::new(),
-        ping_interval: None
-    };
+    let mut options = Options::new();
 
     {  // this block limits scope of borrows by ap.refer() method
         let mut ap = ArgumentParser::new();
@@ -116,4 +104,3 @@ fn main() {
 
     program::run_wsta(&mut options);
 }
-
