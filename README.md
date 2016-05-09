@@ -8,6 +8,8 @@ magic on the WebSocket traffic directly. The way it does this is to be as
 pipe-friendly as possible, letting you chain it into complex pipelines or bash
 scripts as you see fit.
 
+See the [manual](wsta.md) or type `man wsta` for details.
+
 ## Cool things you can do
 
 Since `wsta` is really pipe-friendly, you can easily work with your output in
