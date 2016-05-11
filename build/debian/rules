@@ -1,0 +1,65 @@
+#!/usr/bin/make -f
+
+# Uncomment this to turn on verbose mode.
+DH_VERBOSE = 1
+# $BUILD_ROOT
+DESTDIR=/usr/src/packages/BUILD/debian
+RUSTDIR=/usr/src/packages/BUILD/rust
+
+# Environment information.
+DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
+
+build: build-wsta
+build-wsta:
+	dh_testdir
+	mkdir -pv rust-beta
+	tar -xzf rust-beta-$(DEB_TARGET_GNU_CPU)-unknown-linux-gnu.tar.gz -C rust-beta --strip-components 1
+	mkdir -pv $(RUSTDIR)
+	sh rust-beta/install.sh --without="rust-docs" --prefix="$(RUSTDIR)" --disable-ldconfig
+	ls -lah $(RUSTDIR)
+	ls -lah $(RUSTDIR)/bin
+	PATH=$(PATH):$(RUSTDIR)/bin CARGO_HOME=$(PWD)/.cargo cargo build --release
+	cp target/release/wsta $(DESTDIR)/wsta
+
+clean:
+	dh_testdir
+	dh_testroot
+	rm -rf target rust-beta wsta
+	dh_clean
+
+# Build architecture-independent files here.
+binary-indep: build
+	# We have nothing to do by default.
+
+# Build architecture-dependent files here.
+binary-arch: build
+	dh_testdir
+	dh_testroot
+#	dh_installdebconf
+#	dh_installdocs
+#	dh_installexamples
+	dh_installmenu
+#	dh_installlogrotate
+#	dh_installemacsen
+#	dh_installpam
+#	dh_installmime
+#	dh_installinit
+#	dh_installcron
+	dh_installman
+#	dh_installinfo
+#	dh_undocumented
+	dh_installchangelogs
+	dh_link
+	dh_strip
+	dh_compress
+	dh_fixperms
+#	dh_makeshlibs
+	dh_installdeb
+#	dh_perl
+#	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary: binary-indep binary-arch
+
