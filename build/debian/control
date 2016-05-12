@@ -1,5 +1,5 @@
 Source: wsta
-Section: main/devel
+Section: devel
 Priority: optional
 Maintainer: Espen Henriksen <dev+wsta@henriksen.is>
 Build-Depends: debhelper (>= 4.1.16), libssl-dev (>= 1), gcc (>= 4)

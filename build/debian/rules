@@ -2,24 +2,23 @@
 
 # Uncomment this to turn on verbose mode.
 DH_VERBOSE = 1
-# $BUILD_ROOT
-DESTDIR=/usr/src/packages/BUILD/debian
+DESTDIR=/usr/src/packages/BUILD/debian/wsta
 RUSTDIR=/usr/src/packages/BUILD/rust
-
-# Environment information.
-DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
 
 build: build-wsta
 build-wsta:
 	dh_testdir
 	mkdir -pv rust-beta
 	tar -xzf rust-beta-$(DEB_TARGET_GNU_CPU)-unknown-linux-gnu.tar.gz -C rust-beta --strip-components 1
-	mkdir -pv $(RUSTDIR)
+	mkdir -pv $(RUSTDIR) $(DESTDIR)
 	sh rust-beta/install.sh --without="rust-docs" --prefix="$(RUSTDIR)" --disable-ldconfig
-	ls -lah $(RUSTDIR)
-	ls -lah $(RUSTDIR)/bin
 	PATH=$(PATH):$(RUSTDIR)/bin CARGO_HOME=$(PWD)/.cargo cargo build --release
-	cp target/release/wsta $(DESTDIR)/wsta
+
+install:
+	mkdir -p $(DESTDIR)/usr/local $(DESTDIR)/usr/loal/share/man/man1
+	PATH=$(PATH):$(RUSTDIR)/bin CARGO_HOME=$(PWD)/.cargo cargo install --root=$(DESTDIR)/usr
+	rm -vf $(DESTDIR)/usr/.crates.toml
+	cp -v wsta.1 $(DESTDIR)/usr/loal/share/man/man1/wsta.1
 
 clean:
 	dh_testdir
@@ -28,11 +27,11 @@ clean:
 	dh_clean
 
 # Build architecture-independent files here.
-binary-indep: build
+binary-indep: build install
 	# We have nothing to do by default.
 
 # Build architecture-dependent files here.
-binary-arch: build
+binary-arch: build install
 	dh_testdir
 	dh_testroot
 #	dh_installdebconf
@@ -48,15 +47,18 @@ binary-arch: build
 	dh_installman
 #	dh_installinfo
 #	dh_undocumented
-	dh_installchangelogs
+#	dh_installchangelogs
 	dh_link
 	dh_strip
 	dh_compress
 	dh_fixperms
 #	dh_makeshlibs
-	dh_installdeb
+#	dh_installdeb
 #	dh_perl
 #	dh_shlibdeps
+	ls -la .
+	ls -la ..
+	ls -la debian
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb
