@@ -30,6 +30,8 @@ rm -rfv deploy
 rm -rf ~/.cargo
 cargo clean
 
+./package-debian.sh
+
 echo Fetching offline assets
 cargo fetch
 
@@ -43,8 +45,5 @@ cp deploy/$1.tar.gz deploy/wsta_$1.orig.tar.gz
 
 
 rm -rf deploy/wsta-$1
-
-echo Packaging debian assets
-tar -C build -czf deploy/debian.tar.gz debian
 
 echo Done!
