@@ -15,10 +15,9 @@ build-wsta:
 	PATH=$(PATH):$(RUSTDIR)/bin CARGO_HOME=$(PWD)/.cargo cargo build --release
 
 install:
-	mkdir -p $(DESTDIR)/usr/local $(DESTDIR)/usr/loal/share/man/man1
+	mkdir -p $(DESTDIR)/usr/local
 	PATH=$(PATH):$(RUSTDIR)/bin CARGO_HOME=$(PWD)/.cargo cargo install --root=$(DESTDIR)/usr
 	rm -vf $(DESTDIR)/usr/.crates.toml
-	cp -v wsta.1 $(DESTDIR)/usr/loal/share/man/man1/wsta.1
 
 clean:
 	dh_testdir
@@ -44,7 +43,7 @@ binary-arch: build install
 #	dh_installmime
 #	dh_installinit
 #	dh_installcron
-	dh_installman
+	dh_installman wsta.1
 #	dh_installinfo
 #	dh_undocumented
 #	dh_installchangelogs
