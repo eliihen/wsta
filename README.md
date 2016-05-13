@@ -67,15 +67,15 @@ Currently the only requirement to run `wsta` is openssl. If you get an error
 about a missing `ssllib.so` or similar, search your package manager for openssl
 or similar to add this library.
 
-### Fedora
-You run Fedora? You're in luck! I've set up a download page here that you can
-get `wsta` from
+### 64-bit Linux
+I've set up a download page here that you can get `wsta`
 
 https://software.opensuse.org/download.html?project=home%3Aesphen&package=wsta
 
-I'm working on getting more distributions into the Open Build Service pipeline,
-which is what creates the releases on that page. For now, you need Fedora to use
-that page. If you don't use Fedora, have a look below at other options.
+I'm working on getting more distributions, as well as 32-bit into the Open Build
+Service pipeline, which is what creates the releases on that page. For now, you
+need a 64-bit system to use that page. If you don't use a 64-bit system, have a
+look below at compiling it yourself.
 
 ### Mac OS X
 To install on Max OS X, ensure you have [homebrew](http://brew.sh) installed,
