@@ -3,10 +3,11 @@
 The WebSocket Transfer Agent
 
 `wsta` is a cli tool written in rust for interfacing with WebSockets. `wsta` has
-the simple philosophy of getting out of your way and letting you work your UNIX
-magic on the WebSocket traffic directly. The way it does this is to be as
-pipe-friendly as possible, letting you chain it into complex pipelines or bash
-scripts as you see fit.
+the philosophy of being an easy tool to learn and thus gets out of your way to
+let you work your UNIX magic directly on the WebSocket traffic.
+The way `wsta` does this is to be as pipe-friendly as possible, letting you
+chain it into complex pipelines or bash scripts as you see fit, or just keep it
+simple and use it as is.
 
 See the [manual](wsta.md) or type `man wsta` for details.
 
@@ -18,11 +19,23 @@ might want to have your data printed in a nice, readable format.
 [jq](https://stedolan.github.io/jq/) is perfect for that.
 
 ```bash
-$ wsta ws://echo.websocket.org '{"test": "what?"}' | jq .
+$ wsta ws://echo.websocket.org '{"values":{"test": "what?"}}' | jq .values
 Connected to ws://echo.websocket.org
 {
   "test": "what?"
 }
+```
+
+Because `wsta` reads from stdin, it can also be used as an interactive prompt
+if you wish to send messages to the server interactively.
+
+```bash
+$ wsta ws://echo.websocket.org
+Connected to ws://echo.websocket.org
+ping
+ping
+hello
+hello
 ```
 
 If you're debugging some nasty problem with your stream, you are probably only
@@ -92,6 +105,10 @@ into your `$PATH`.
 
 https://github.com/esphen/wsta/releases
 
+### Windows
+
+See "Compile it yourself".
+
 ### Compile it yourself
 
 DON'T PANIC. It's really easy to compile and install `wsta` yourself! Rust
@@ -113,10 +130,7 @@ I have only tested Linux, however, so YMMV.
     cd wsta
 
     # Finally: compile and install it to your system
-    sudo cargo install --root /usr/local
-
-    # This will create a file called .crates.toml. You can delete it if you want
-    sudo rm /usr/local/.crates.toml
+    sudo make install
 
 ## Development setup
 
@@ -133,4 +147,9 @@ Run the program
 In order to generate the man page, `groff` is needed
 
     make man
+
+If updates to the man page are done, remember to generate the markdown manual
+afterwards
+
+    make wsta.md
 
