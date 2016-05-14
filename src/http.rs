@@ -1,3 +1,7 @@
+use std::io;
+use std::io::Write;
+use std::process::exit;
+
 use cookie::Cookie as CookiePair;
 
 use hyper::Client;
@@ -17,17 +21,18 @@ pub fn fetch_session_cookie(options: &Options) -> Option<Cookie> {
     log!(3, "Created HTTP client: {:?}", client);
 
     // Parse string as url and handle ParseErrors
-    let url;
-    match Url::parse(&options.login_url) {
+    let url = match Url::parse(&options.login_url) {
         Ok(result) => {
             log!(2, "Parsed URL {:?}", result);
-            url = result;
+
+            result
         }
         Err(err) => {
-            log!(1, "Error: {:?}", err);
-            panic!("Failed to parse url '{}': {}", &options.login_url, &err);
+            log!(1, "Error object: {:?}", err);
+            stderr!("Failed to parse url '{}': {}", &options.login_url, &err);
+            exit(1);
         }
-    }
+    };
 
     // Wrap with TLS if needed
     if url.scheme() == "https" {
@@ -63,7 +68,8 @@ pub fn fetch_session_cookie(options: &Options) -> Option<Cookie> {
         },
         Err(err) => {
             log!(1, "Error: {:?}", err);
-            panic!("Error sending login request: {}", &err);
+            stderr!("Error sending login request: {}", &err);
+            exit(1);
         }
     }
 }
