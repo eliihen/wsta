@@ -1,4 +1,5 @@
 use std::io;
+use std::io::Write;
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::process::exit;
@@ -81,11 +82,12 @@ pub fn spawn_websocket_reader<A: 'static>(mut receiver: ReceiverObj<WebSocketStr
                         WebSocketError::NoDataAvailable => {
                             println!("\nDisconnected!");
                             log!(1, "Error: {:?}", err);
-                            exit(0);
+                            exit(2);
                         },
                         _ => {
                             log!(1, "Error: {:?}", err);
-                            panic!("Error in WebSocket reader: {}", err);
+                            stderr!("Error in WebSocket reader: {}", err);
+                            exit(2);
                         }
                     }
                 }
@@ -106,7 +108,16 @@ pub fn read_stdin_buffer(sender: &mut SenderObj<WebSocketStream>,
     for line in vec.drain(..) {
         log!(3, "Read: {}", line);
         let message = Message::text(line.trim());
-        sender.send_message(&message).unwrap();
+
+        match sender.send_message(&message) {
+            Err(err) => {
+                log!(1, "Error object: {:?}", err);
+                stderr!("An error occured while sending message {:?}: {}",
+                        message, err);
+                exit(2);
+            },
+            _ => {}
+        };
     }
 }
 

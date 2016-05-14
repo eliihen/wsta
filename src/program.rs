@@ -20,19 +20,27 @@ pub fn run_wsta(options: &mut Options) {
 
     // Get the URL
     log!(2, "About to unwrap: {}", options.url);
-    let url = Url::parse(&options.url).unwrap();
+    let url = match Url::parse(&options.url) {
+        Ok(res) => res,
+        Err(err) => {
+            log!(1, "Error object: {:?}", err);
+            stderr!("An error occured while parsing {} as a WS URL: {}",
+                    options.url, err);
+            exit(1);
+        }
+    };
     log!(3, "Parsed URL: {}", url);
 
     // Connect to the server
-    let mut request;
-    match Client::connect(url) {
-        Ok(res) => request = res,
+    let mut request = match Client::connect(url) {
+        Ok(res) => res,
         Err(err) => {
-            log!(1, "Error object: {:?}", err);
-            panic!("An error occured while connecting to {}: {}",
+            log!(1, "Error: {:?}", err);
+            stderr!("An error occured while connecting to {}: {}",
                            options.url, err);
+            exit(1);
         }
-    }
+    };
 
     // Authenticate if requested
     if !options.login_url.is_empty() {
@@ -44,8 +52,11 @@ pub fn run_wsta(options: &mut Options) {
             log!(3, "Session cookie set on request. Headers are now: {:?}",
                  request.headers);
         } else {
-            panic!(concat!("Attempted to fetch session cookie, but no ",
-              ".*session.* cookie was found in response. Inspect -I"));
+            log!(1, "session_cookie object: {:?}", session_cookie);
+            stderr!(concat!("Attempted to fetch session cookie, but no ",
+              ".*session.* cookie was found in response's SetCookie header.",
+              "Try looking at -I"));
+            exit(1);
         }
     }
 
@@ -77,7 +88,7 @@ pub fn run_wsta(options: &mut Options) {
             stderr!("{}", error);
 
             if !options.print_headers {
-                stderr!("Try -I for more info");
+                stderr!("Try using -I for more info");
             }
 
             exit(1);
