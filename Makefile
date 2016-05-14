@@ -6,4 +6,4 @@ man:
 	groff -man -Tascii ./wsta.1 | less
 
 wsta.md:
-	groff -man -Tascii ./wsta.1 | col -bx | sed 's/^[A-Z]/## &/g' | sed '/wsta(1)/d' > wsta.md
+	groff -man -Tascii ./wsta.1 | col -bx | sed -re 's/[0-9]+m//g' -e  's/^[A-Z]/## &/g' -e '/wsta(1)/d' > wsta.md
