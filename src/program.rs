@@ -24,19 +24,20 @@ pub fn run_wsta(options: &mut Options) {
         Ok(res) => res,
         Err(err) => {
             log!(1, "Error object: {:?}", err);
-            stderr!("An error occured while parsing {} as a WS URL: {}",
+            stderr!("An error occured while parsing '{}' as a WS URL: {}",
                     options.url, err);
             exit(1);
         }
     };
     log!(3, "Parsed URL: {}", url);
 
+    log!(2, "About to connect to {}", url);
     // Connect to the server
     let mut request = match Client::connect(url) {
         Ok(res) => res,
         Err(err) => {
             log!(1, "Error: {:?}", err);
-            stderr!("An error occured while connecting to {}: {}",
+            stderr!("An error occured while connecting to '{}': {}",
                            options.url, err);
             exit(1);
         }
@@ -72,8 +73,18 @@ pub fn run_wsta(options: &mut Options) {
 
     // Send the request
     log!(3, "About to send and unwrap request");
-    let response = request.send().unwrap();
-    log!(3, "Request sent");
+    let response = match request.send() {
+        Ok(response) => {
+            log!(3, "Request sent");
+
+            response
+        },
+        Err(err) => {
+            log!(1, "Error object: {:?}", err);
+            stderr!("An error occured when connecting: {}", err);
+            exit(1);
+        }
+    };
 
     // Dump headers when requested
     if options.print_headers {
@@ -173,7 +184,15 @@ fn send_messages(sender: &mut SenderObj<WebSocketStream>,
         }
 
         let frame = Message::text(message.as_str());
-        sender.send_message(&frame).unwrap();
+        match sender.send_message(&frame) {
+            Err(err) => {
+                log!(1, "Error object: {:?}", err);
+                stderr!("An error occured while sending message {:?}: {}",
+                        message, err);
+                exit(1);
+            },
+            _ => {}
+        };
     }
 }
 
