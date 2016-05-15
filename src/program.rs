@@ -29,10 +29,13 @@ pub fn run_wsta(options: &mut Options) {
             exit(1);
         }
     };
-    log!(3, "Parsed URL: {}", url);
+    log!(3, "Parsed URL: {:?}", url);
 
-    log!(2, "About to connect to {}", url);
+    let origin = get_origin(&url);
+    log!(3, "Parsed Origin string: {}", origin);
+
     // Connect to the server
+    log!(2, "About to connect to {}", url);
     let mut request = match Client::connect(url) {
         Ok(res) => res,
         Err(err) => {
@@ -42,6 +45,9 @@ pub fn run_wsta(options: &mut Options) {
             exit(1);
         }
     };
+
+    // Set Origin header to be equal to the websocket url
+    request.headers.set_raw("Origin", vec![origin.into_bytes()]);
 
     // Authenticate if requested
     if !options.login_url.is_empty() {
@@ -144,6 +150,17 @@ pub fn run_wsta(options: &mut Options) {
         // ping_interval that can be input
         thread::sleep(Duration::from_secs(1));
     }
+}
+
+/// Parses an Origin string from a websocket URL, replacing ws[s] with http[s].
+fn get_origin(url: &Url) -> String {
+    let scheme = if url.scheme() == "wss" {
+        "https"
+    } else {
+        "http"
+    };
+
+    format!("{}://{}", scheme, url.host_str().unwrap_or(""))
 }
 
 fn add_headers_to_request(request: &mut Request<WebSocketStream, WebSocketStream>,
