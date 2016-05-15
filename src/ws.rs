@@ -114,7 +114,7 @@ pub fn read_stdin_buffer(sender: &mut SenderObj<WebSocketStream>,
                 log!(1, "Error object: {:?}", err);
                 stderr!("An error occured while sending message {:?}: {}",
                         message, err);
-                exit(2);
+                exit(1);
             },
             _ => {}
         };
@@ -142,7 +142,15 @@ pub fn check_ping_interval(ping_interval: &Option<Duration>,
             }
 
             let frame = Message::text("ping");
-            sender.send_message(&frame).unwrap();
+            match sender.send_message(&frame) {
+                Err(err) => {
+                    log!(1, "Error object: {:?}", err);
+                    stderr!("An error occured while sending message {:?}: {}",
+                            frame, err);
+                    exit(1);
+                },
+                _ => {}
+            };
 
             return now
         }
