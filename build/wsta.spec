@@ -1,5 +1,5 @@
 Name:           wsta
-Version:        0.2.0
+Version:        0.2.1
 Release:        1%{?dist}
 Summary:        The WebSocket Transfer Agent
 
@@ -49,6 +49,10 @@ cp -v wsta.1 $RPM_BUILD_ROOT/usr/local/share/man/man1/wsta.1
 
 
 %changelog
+* Tue May 17 2016 Espen Henriksen <dev+wsta@henriksen.is>
+- Set Origin header based on WS URL
+- Make exit codes more consistent
+- Update dependencies
 * Sun May 08 2016 Espen Henriksen <dev+wsta@henriksen.is>
 - Change syntax to be wsta [OPTIONS] URL [MESSAGES ...]
 - Is now quiet by default
