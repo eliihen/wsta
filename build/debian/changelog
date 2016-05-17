@@ -1,3 +1,11 @@
+wsta (0.2.1-0) stable; urgency=low
+
+ * Set Origin header based on WS URL
+ * Make exit codes more consistent
+ * Update dependencies
+
+ -- Espen Henriksen <dev+wsta@henriksen.is>  Tue, 17 May 2016 17:18:00 +0200
+
 wsta (0.2.0-0) stable; urgency=low
 
  * Initial deb Release
