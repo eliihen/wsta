@@ -121,17 +121,12 @@ I have only tested Linux, however, so YMMV.
     # Install the rust language and tools
     curl -sSf https://static.rust-lang.org/rustup.sh | sh -s -- --channel=beta
 
-    # Install required libraries, using your distribution's package manager
+    # Install gcc and OpenSSL on your OS
     dnf install -y gcc openssl-devel
 
-    # Clone the git repository
-    mkdir -p ~/workspace
-    cd ~/workspace
-    git clone https://github.com/esphen/wsta.git
-    cd wsta
-
-    # Finally: compile and install it to your system
-    sudo make install
+    # Install wsta to `$CARGO_HOME` if set or `$HOME/.cargo`
+    # To change the install path, try setting --root to a directory like /usr/local
+    cargo install --git https://github.com/esphen/wsta.git
 
 ## Development setup
 
