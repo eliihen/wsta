@@ -76,9 +76,10 @@ done
 
 ### Requirements
 
-Currently the only requirement to run `wsta` is openssl. If you get an error
-about a missing `ssllib.so` or similar, search your package manager for openssl
-or similar to add this library.
+Currently the only requirement to run `wsta` is rust-openssl. If you get an error
+about a missing `ssllib.so` or similar, try installing OpenSSL runtime libraries
+and headers. Have a look at [this link](https://github.com/sfackler/rust-openssl#building)
+for instructions on how to do so.
 
 ### 64-bit Linux
 I've set up a download page here that you can get `wsta`
