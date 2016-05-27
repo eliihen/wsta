@@ -14,6 +14,7 @@ use websocket::stream::WebSocketStream;
 use log;
 use ws;
 use options::Options;
+use frame_data::FrameData;
 use http::{fetch_session_cookie, print_headers};
 
 pub fn run_wsta(options: &mut Options) {
@@ -130,7 +131,8 @@ pub fn run_wsta(options: &mut Options) {
     // Share mutable data between writer thread and main thread
     // using a lockable Mutex.
     // Mutex will block threads waiting for the lock to become available
-    let stdin_buffer = ws::spawn_stdin_reader::<Arc<Mutex<Vec<String>>>>(options.echo);
+    let stdin_buffer = ws::spawn_stdin_reader::<Arc<Mutex<Vec<FrameData>>>>
+        (options.echo, options.binary_frame_size);
 
     // Variables for checking against a ping interval
     let ping_interval = options.ping_interval.map(|i| Duration::from_secs(i));
@@ -146,9 +148,10 @@ pub fn run_wsta(options: &mut Options) {
         last_time = ws::check_ping_interval(&ping_interval, last_time,
                                             &mut sender, options.echo);
 
-        // Sleep for a second at a time, as this is the smallest possible
+        // Sleep for 0.25 seconds at a time, to give the processor some rest.
+        // Should be a multiple of 1 second as this is the smallest possible
         // ping_interval that can be input
-        thread::sleep(Duration::from_secs(1));
+        thread::sleep(Duration::from_millis(250));
     }
 }
 

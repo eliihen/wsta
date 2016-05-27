@@ -26,6 +26,7 @@ extern crate cookie;
 // Needs to be imported first because of log! macro
 #[macro_use]
 mod log;
+mod frame_data;
 mod program;
 mod http;
 mod ws;
@@ -70,6 +71,11 @@ fn main() {
         ap.refer(&mut options.login_url)
             .add_option(&["-l", "--login"], Store,
                         "URL to authenticate with before connecting to WS");
+
+        ap.refer(&mut options.binary_frame_size)
+            .metavar("KB")
+            .add_option(&["-b", "--binary-frame-size"], StoreOption,
+                        "specify size of binary frames. Default is 5KB");
 
         ap.refer(&mut options.follow_redirect)
             .add_option(&["--follow-redirect"], StoreTrue,
