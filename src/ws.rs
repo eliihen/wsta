@@ -12,7 +12,6 @@ use websocket::stream::WebSocketStream;
 use websocket::result::WebSocketError;
 
 use frame_data::FrameData;
-use log;
 
 /// Spawn a thread to read stdin. This must be done in a thread because reading
 /// io is a blocking action, and thus the thread reading stdin cannot be the
@@ -61,9 +60,7 @@ pub fn spawn_websocket_reader<A: 'static>(mut receiver: ReceiverObj<WebSocketStr
 
         for message in receiver.incoming_messages() {
             match message {
-                Ok(msg) => {
-                    println!("{}", message_to_string(msg));
-                },
+                Ok(msg) => message_to_stdout(msg),
                 Err(err) => {
 
                     // Handle the different types of possible errors
@@ -232,15 +229,25 @@ fn read_as_utf8(stdin_buffer: &Arc<Mutex<Vec<FrameData>>>,
     }
 }
 
-fn message_to_string<'a>(message: Message) -> String {
+fn message_to_stdout(message: Message) {
     let owned = message.payload.into_owned();
 
-    return match String::from_utf8(owned) {
-        Ok(result) => result,
+    match String::from_utf8(owned.clone()) {
+        Ok(result) => println!("{}", result),
         Err(error) => {
+
+            // Failed to parse as UTF-8, assume it is binary
+            log!(1, "Error: {}", error);
             log!(2, "Error: {:?}", error);
 
-            String::from("Binary data")
+            match io::stdout().write(owned.as_ref()) {
+                Err(error) => {
+                    stderr!("Failed to write message to stdout: {}", error);
+                    log!(2, "Error: {:?}", error);
+                    exit(1);
+                },
+                _ => {}
+            }
         }
     }
 }
