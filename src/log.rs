@@ -1,30 +1,30 @@
 static mut log_level: u8 = 0;
 
+macro_rules! stderr {
+    ( $( $msg:tt )* ) => {{
+        writeln!(io::stderr(), $($msg)*).unwrap();
+    }}
+}
+
 macro_rules! log {
     // No format string
     ($loudness:expr, $msg:expr ) => {{
         let log_level = $crate::log::get_log_level();
 
         if log_level >= $loudness  {
-            println!("VERB {}: {}", $loudness, $msg);
+            stderr!("VERB {}: {}", $loudness, $msg);
         }
     }};
     // Format string and args
     ($loudness:expr, $( $msg:tt )* ) => {{
 
-        let log_level = log::get_log_level();
+        let log_level = $crate::log::get_log_level();
 
         if log_level >= $loudness  {
             let pretty_msg = format!($($msg)*);
-            println!("VERB {}: {}", $loudness, pretty_msg);
+            stderr!("VERB {}: {}", $loudness, pretty_msg);
         }
     }};
-}
-
-macro_rules! stderr {
-    ( $( $msg:tt )* ) => {{
-        writeln!(io::stderr(), $($msg)*).unwrap();
-    }}
 }
 
 /// Sets the log level of the application. See `Options::verbosity` for
