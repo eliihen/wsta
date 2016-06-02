@@ -1,4 +1,3 @@
-use std;
 use std::io;
 use std::io::Write;
 use std::sync::{Arc, Mutex};
@@ -131,7 +130,6 @@ pub fn run_wsta(options: &mut Options) {
     // Share mutable data between writer thread and main thread
     // using a lockable Mutex.
     // Mutex will block threads waiting for the lock to become available
-    std::thread::sleep(Duration::from_secs(2));
     let stdin_buffer = ws::spawn_stdin_reader::<Arc<Mutex<Vec<FrameData>>>>
         (options.echo, options.binary_mode);
 
