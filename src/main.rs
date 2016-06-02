@@ -74,9 +74,8 @@ fn main() {
             .add_option(&["-l", "--login"], Store,
                         "URL to authenticate with before connecting to WS");
 
-        ap.refer(&mut options.binary_frame_size)
-            .metavar("KB")
-            .add_option(&["-b", "--binary-frame-size"], StoreOption,
+        ap.refer(&mut options.binary_mode)
+            .add_option(&["-b", "--binary"], StoreTrue,
                         "specify size of binary frames. Default is 5KB");
 
         ap.refer(&mut options.follow_redirect)
