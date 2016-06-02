@@ -44,6 +44,10 @@ pub struct Options {
     /// If provided, will turn the program into a binary mode, reading 255 bytes
     /// at a time and sending frames when the buffer is filled
     pub binary_mode: bool,
+
+    /// Specifies the amount of bytes per frame to send when
+    /// sending binary data.
+    pub binary_frame_size: String
 }
 
 impl Options {
@@ -58,7 +62,8 @@ impl Options {
             headers: Vec::new(),
             messages: Vec::new(),
             ping_interval: None,
-            binary_mode: false
+            binary_mode: false,
+            binary_frame_size: String::from("256")
         }
     }
 }

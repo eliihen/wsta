@@ -131,7 +131,7 @@ pub fn run_wsta(options: &mut Options) {
     // using a lockable Mutex.
     // Mutex will block threads waiting for the lock to become available
     let stdin_buffer = ws::spawn_stdin_reader::<Arc<Mutex<Vec<FrameData>>>>
-        (options.echo, options.binary_mode);
+        (options.echo, options.binary_mode, options.binary_frame_size.clone());
 
     // Variables for checking against a ping interval
     let ping_interval = options.ping_interval.map(|i| Duration::from_secs(i));

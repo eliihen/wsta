@@ -12,7 +12,6 @@ use websocket::stream::WebSocketStream;
 use websocket::result::WebSocketError;
 
 use frame_data::FrameData;
-use constants::DEFAULT_BINARY_FRAME_SIZE;
 
 /// Spawn a thread to read stdin. This must be done in a thread because reading
 /// io is a blocking action, and thus the thread reading stdin cannot be the
@@ -24,8 +23,9 @@ use constants::DEFAULT_BINARY_FRAME_SIZE;
 /// Function has a static lifetime so the thread does not outlive the function
 /// that owns it.
 // TODO Move to ws_writer.rs
-pub fn spawn_stdin_reader<A: 'static>(echo: bool, binary_mode: bool)
-    -> Arc<Mutex<Vec<FrameData>>> {
+pub fn spawn_stdin_reader<A: 'static>(echo: bool,
+                                      binary_mode: bool,
+                                      frame_size: String) -> Arc<Mutex<Vec<FrameData>>> {
 
     let arc = Arc::new(Mutex::new(Vec::<FrameData>::new()));
     let stdin_buffer = arc.clone();
@@ -36,7 +36,7 @@ pub fn spawn_stdin_reader<A: 'static>(echo: bool, binary_mode: bool)
         loop {
 
             if binary_mode {
-                read_as_binary(&stdin_buffer);
+                read_as_binary(&stdin_buffer, frame_size.clone());
             } else {
                 read_as_utf8(&stdin_buffer, echo);
             }
@@ -154,13 +154,13 @@ pub fn check_ping_interval(ping_interval: &Option<Duration>,
 
 /// Read binary data from stdin in chunks of binary_mode
 /// and write it to stdin_buffer
-fn read_as_binary(stdin_buffer: &Arc<Mutex<Vec<FrameData>>>) {
+fn read_as_binary(stdin_buffer: &Arc<Mutex<Vec<FrameData>>>,
+                  frame_size_str: String) {
 
     // Parse WSTA_BINARY_FRAME_SIZE environment variable
     // as the size of the binary buffer, or use a global
     // default if not present
-    let frame_size = match option_env!("WSTA_BINARY_FRAME_SIZE")
-        .unwrap_or(DEFAULT_BINARY_FRAME_SIZE).parse() {
+    let frame_size = match frame_size_str.parse() {
         Ok(result) => result,
         Err(error) => {
             stderr!("Error! WSTA_BINARY_FRAME_SIZE must be a number: {}", error);
