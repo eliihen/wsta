@@ -11,7 +11,6 @@ use websocket::client::Receiver as ReceiverObj;
 use websocket::client::request::{Request, Url};
 use websocket::stream::WebSocketStream;
 
-use log;
 use ws;
 use options::Options;
 use frame_data::FrameData;

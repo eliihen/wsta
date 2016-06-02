@@ -11,7 +11,6 @@ use hyper::header::{Headers, SetCookie, Cookie};
 use hyper::status::StatusCode;
 use hyper::client::RedirectPolicy;
 
-use log;
 use options::Options;
 
 pub fn fetch_session_cookie(options: &Options) -> Option<Cookie> {

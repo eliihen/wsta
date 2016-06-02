@@ -9,7 +9,7 @@
 //! Connect to a WebSocket server
 //!
 //! ```bash
-//! wsta -u wss://echo.websocket.org
+//! wsta wss://echo.websocket.org
 //! ```
 //!
 //! # Exit codes
@@ -33,6 +33,8 @@ mod ws;
 mod options;
 
 use argparse::*;
+use std::io;
+use std::io::Write;
 
 use options::Options;
 
