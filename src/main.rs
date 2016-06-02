@@ -26,7 +26,6 @@ extern crate cookie;
 // Needs to be imported first because of log! macro
 #[macro_use]
 mod log;
-mod constants;
 mod frame_data;
 mod program;
 mod http;
@@ -98,6 +97,9 @@ fn main() {
                                     env!("CARGO_PKG_VERSION"))
                             ),
                       "print version number and exit");
+
+        ap.refer(&mut options.binary_frame_size)
+            .envvar("WSTA_BINARY_FRAME_SIZE");
 
         ap.refer(&mut options.messages)
             .add_argument("messages", Collect,
