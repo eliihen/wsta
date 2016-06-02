@@ -12,6 +12,7 @@ use websocket::stream::WebSocketStream;
 use websocket::result::WebSocketError;
 
 use frame_data::FrameData;
+use constants::DEFAULT_BINARY_FRAME_SIZE;
 
 /// Spawn a thread to read stdin. This must be done in a thread because reading
 /// io is a blocking action, and thus the thread reading stdin cannot be the
@@ -155,11 +156,20 @@ pub fn check_ping_interval(ping_interval: &Option<Duration>,
 /// and write it to stdin_buffer
 fn read_as_binary(stdin_buffer: &Arc<Mutex<Vec<FrameData>>>) {
 
-    // Buffer will hold binary_mode bytes or
-    // a global default
-    // TODO Move to constants.rs
-    let mut buf: Vec<u8> = vec![0; 256];
+    // Parse WSTA_BINARY_FRAME_SIZE environment variable
+    // as the size of the binary buffer, or use a global
+    // default if not present
+    let frame_size = match option_env!("WSTA_BINARY_FRAME_SIZE")
+        .unwrap_or(DEFAULT_BINARY_FRAME_SIZE).parse() {
+        Ok(result) => result,
+        Err(error) => {
+            stderr!("Error! WSTA_BINARY_FRAME_SIZE must be a number: {}", error);
+            log!(1, "Error: {:?}", error);
+            exit(1);
+        }
+    };
 
+    let mut buf: Vec<u8> = vec![0; frame_size];
     let stdin = io::stdin();
 
     // Read stdin until buffer is full
@@ -174,13 +184,27 @@ fn read_as_binary(stdin_buffer: &Arc<Mutex<Vec<FrameData>>>) {
                 }
             }
 
+            // Read no bytes, return 0
             0
         }
     };
 
+    if read_bytes == 0 {
+      log!(3, "No bytes were read");
+      return
+    }
+
     log!(3, "Read {} bytes of binary data", read_bytes);
 
-    if read_bytes != 0 {
+    // If we read less than the buffer size, we need
+    // to shrink it. This is so we avoid sending extra
+    // zeroes in the frames.
+    if read_bytes < frame_size {
+        buf.resize(read_bytes, 0);
+        log!(3, "Resized buffer");
+    }
+
+    if read_bytes > 0 {
 
         log!(4, "Following binary data was read from stdin: {:?}", buf);
 

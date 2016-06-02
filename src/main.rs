@@ -26,6 +26,7 @@ extern crate cookie;
 // Needs to be imported first because of log! macro
 #[macro_use]
 mod log;
+mod constants;
 mod frame_data;
 mod program;
 mod http;
