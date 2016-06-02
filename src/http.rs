@@ -75,14 +75,14 @@ pub fn fetch_session_cookie(options: &Options) -> Option<Cookie> {
 
 pub fn print_headers(title: &str, headers: &Headers,
                      status: Option<StatusCode>) {
-    println!("{}", title);
-    println!("---");
+    stderr!("{}", title);
+    stderr!("---");
 
     if status.is_some() {
-        println!("{}", status.unwrap());
+        stderr!("{}", status.unwrap());
     }
 
-    println!("{}\n", headers);
+    stderr!("{}\n", headers);
 }
 
 /// Finds the cookie with name matching .*session.* and returns it

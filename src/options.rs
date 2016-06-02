@@ -41,9 +41,9 @@ pub struct Options {
     /// frame to the server.
     pub ping_interval: Option<u64>,
 
-    /// If provided, will specify an interval for wsta to send a ping
-    /// frame to the server.
-    pub binary_frame_size: Option<usize>,
+    /// If provided, will turn the program into a binary mode, reading 255 bytes
+    /// at a time and sending frames when the buffer is filled
+    pub binary_mode: bool,
 }
 
 impl Options {
@@ -58,7 +58,7 @@ impl Options {
             headers: Vec::new(),
             messages: Vec::new(),
             ping_interval: None,
-            binary_frame_size: None
+            binary_mode: false
         }
     }
 }
