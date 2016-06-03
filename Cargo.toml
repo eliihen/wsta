@@ -1,6 +1,6 @@
 [package]
 name = "wsta"
-version = "0.2.1"
+version = "0.3.0"
 authors = ["Espen Henriksen <dev@henriksen.is>"]
 description = "The WebSocket Transfer Agent"
 

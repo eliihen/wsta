@@ -1,5 +1,5 @@
 Name:           wsta
-Version:        0.2.1
+Version:        0.3.0
 Release:        1%{?dist}
 Summary:        The WebSocket Transfer Agent
 
@@ -49,6 +49,9 @@ cp -v wsta.1 $RPM_BUILD_ROOT/usr/local/share/man/man1/wsta.1
 
 
 %changelog
+* Fri Jun 03 2016 Espen Henriksen <dev+wsta@henriksen.is>
+- Add support for binary data
+- Only frames are printed to stdout, rest is now stderr
 * Tue May 17 2016 Espen Henriksen <dev+wsta@henriksen.is>
 - Set Origin header based on WS URL
 - Make exit codes more consistent

@@ -1,3 +1,10 @@
+wsta (0.3.0-0) stable; urgency=low
+
+ * Add support for binary data
+ * Only frames are printed to stdout, rest is now stderr
+
+ -- Espen Henriksen <dev+wsta@henriksen.is> Fri, 03 Jun 2016 19:47:00 +0200
+
 wsta (0.2.1-0) stable; urgency=low
 
  * Set Origin header based on WS URL
