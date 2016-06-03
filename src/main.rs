@@ -9,7 +9,7 @@
 //! Connect to a WebSocket server
 //!
 //! ```bash
-//! wsta -u wss://echo.websocket.org
+//! wsta wss://echo.websocket.org
 //! ```
 //!
 //! # Exit codes
@@ -26,12 +26,15 @@ extern crate cookie;
 // Needs to be imported first because of log! macro
 #[macro_use]
 mod log;
+mod frame_data;
 mod program;
 mod http;
 mod ws;
 mod options;
 
 use argparse::*;
+use std::io;
+use std::io::Write;
 
 use options::Options;
 
@@ -71,6 +74,10 @@ fn main() {
             .add_option(&["-l", "--login"], Store,
                         "URL to authenticate with before connecting to WS");
 
+        ap.refer(&mut options.binary_mode)
+            .add_option(&["-b", "--binary"], StoreTrue,
+                        "specify size of binary frames. Default is 5KB");
+
         ap.refer(&mut options.follow_redirect)
             .add_option(&["--follow-redirect"], StoreTrue,
                         "honour HTTP redirection when authenticating");
@@ -90,6 +97,9 @@ fn main() {
                                     env!("CARGO_PKG_VERSION"))
                             ),
                       "print version number and exit");
+
+        ap.refer(&mut options.binary_frame_size)
+            .envvar("WSTA_BINARY_FRAME_SIZE");
 
         ap.refer(&mut options.messages)
             .add_argument("messages", Collect,

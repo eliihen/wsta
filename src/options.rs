@@ -5,11 +5,12 @@ use std::vec::Vec;
 pub struct Options {
 
     /// The verbosity level of the application. Should be a number
-    /// between 0 and 3.
+    /// between 0 and 4.
     /// * 0:   NO LOGGING
     /// * 1:   ERROR LOGGING
     /// * 2:   DEBUG LOGGING
-    /// * >=3: TRACE LOGGING
+    /// * 3:   TRACE LOGGING
+    /// * >=4: BINARY LOGGING
     pub verbosity: u8,
 
     /// The WebSocket URL to connect to.
@@ -38,7 +39,15 @@ pub struct Options {
 
     /// If provided, will specify an interval for wsta to send a ping
     /// frame to the server.
-    pub ping_interval: Option<u64>
+    pub ping_interval: Option<u64>,
+
+    /// If provided, will turn the program into a binary mode, reading 255 bytes
+    /// at a time and sending frames when the buffer is filled
+    pub binary_mode: bool,
+
+    /// Specifies the amount of bytes per frame to send when
+    /// sending binary data.
+    pub binary_frame_size: String
 }
 
 impl Options {
@@ -52,7 +61,9 @@ impl Options {
             print_headers: false,
             headers: Vec::new(),
             messages: Vec::new(),
-            ping_interval: None
+            ping_interval: None,
+            binary_mode: false,
+            binary_frame_size: String::from("256")
         }
     }
 }

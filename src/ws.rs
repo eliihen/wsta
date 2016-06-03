@@ -1,5 +1,5 @@
 use std::io;
-use std::io::Write;
+use std::io::{Read, Write, ErrorKind};
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::process::exit;
@@ -11,7 +11,7 @@ use websocket::client::Receiver as ReceiverObj;
 use websocket::stream::WebSocketStream;
 use websocket::result::WebSocketError;
 
-use log;
+use frame_data::FrameData;
 
 /// Spawn a thread to read stdin. This must be done in a thread because reading
 /// io is a blocking action, and thus the thread reading stdin cannot be the
@@ -22,40 +22,28 @@ use log;
 ///
 /// Function has a static lifetime so the thread does not outlive the function
 /// that owns it.
-pub fn spawn_stdin_reader<A: 'static>(echo: bool) -> Arc<Mutex<Vec<String>>> {
+// TODO Move to ws_writer.rs
+pub fn spawn_stdin_reader<A: 'static>(echo: bool,
+                                      binary_mode: bool,
+                                      frame_size: String) -> Arc<Mutex<Vec<FrameData>>> {
 
-    let arc = Arc::new(Mutex::new(Vec::<String>::new()));
+    let arc = Arc::new(Mutex::new(Vec::<FrameData>::new()));
     let stdin_buffer = arc.clone();
 
     thread::spawn(move || {
         log!(3, "stdin reader thread spawned");
 
         loop {
-            let mut stdin = String::new();
 
-            // Will block until a stdin-line is read
-            match io::stdin().read_line(&mut stdin) {
-                Ok(_) => {
-
-                    // Only send non-empty lines to server
-                    if !stdin.trim().is_empty() {
-
-                        // Print when ehco is active
-                        if echo {
-                            println!("> {}", stdin.trim());
-                        }
-
-                        // Lock and place read string into buffer
-                        log!(3, "Placing message into stdin_buffer: {}", stdin);
-                        stdin_buffer.lock().unwrap().push(stdin);
-                    }
-                },
-                Err(error) => println!("error: {}", error)
+            if binary_mode {
+                read_as_binary(&stdin_buffer, frame_size.clone());
+            } else {
+                read_as_utf8(&stdin_buffer, echo);
             }
 
             // When looping noninteractively, sleep for a little bit to
             // ensure we don't eat the processor
-            thread::sleep(Duration::new(0, 5000));
+            thread::sleep(Duration::from_millis(50));
         }
     });
 
@@ -65,6 +53,7 @@ pub fn spawn_stdin_reader<A: 'static>(echo: bool) -> Arc<Mutex<Vec<String>>> {
 /// Read incoming messages in a separate thread and write them to stdout.
 /// Function has a static lifetime and ownership of the Receiver is moved
 /// to the spawned thread
+// TODO Move to ws_reader.rs
 pub fn spawn_websocket_reader<A: 'static>(mut receiver: ReceiverObj<WebSocketStream>) {
 
     thread::spawn(move || {
@@ -72,15 +61,13 @@ pub fn spawn_websocket_reader<A: 'static>(mut receiver: ReceiverObj<WebSocketStr
 
         for message in receiver.incoming_messages() {
             match message {
-                Ok(msg) => {
-                    println!("{}", message_to_string(msg));
-                },
+                Ok(msg) => message_to_stdout(msg),
                 Err(err) => {
 
                     // Handle the different types of possible errors
                     match err {
                         WebSocketError::NoDataAvailable => {
-                            println!("\nDisconnected!");
+                            stderr!("\nDisconnected!");
                             log!(1, "Error: {:?}", err);
                             exit(2);
                         },
@@ -99,15 +86,21 @@ pub fn spawn_websocket_reader<A: 'static>(mut receiver: ReceiverObj<WebSocketStr
 /// Reads the `stdin_buffer` and sends the message using the provided
 /// `Sender` if any messages are found. It then flushes the buffer.
 pub fn read_stdin_buffer(sender: &mut SenderObj<WebSocketStream>,
-                     stdin_buffer: Arc<Mutex<Vec<String>>>) {
+                         stdin_buffer: Arc<Mutex<Vec<FrameData>>>) {
 
     // Lock and read string vector from buffer
     let mut vec = stdin_buffer.lock().unwrap();
 
     // Use a draining iterator to read and empty buffer
     for line in vec.drain(..) {
-        log!(3, "Read: {}", line);
-        let message = Message::text(line.trim());
+
+        log!(4, "Read: {:?}", line);
+
+        let message = if line.is_utf8() {
+            Message::text(format!("{}", line.utf8.unwrap().trim()))
+        } else {
+            Message::binary(line.binary.unwrap())
+        };
 
         match sender.send_message(&message) {
             Err(err) => {
@@ -159,9 +152,131 @@ pub fn check_ping_interval(ping_interval: &Option<Duration>,
     last_time
 }
 
-fn message_to_string<'a>(message: Message) -> String {
+/// Read binary data from stdin in chunks of binary_mode
+/// and write it to stdin_buffer
+fn read_as_binary(stdin_buffer: &Arc<Mutex<Vec<FrameData>>>,
+                  frame_size_str: String) {
+
+    // Parse WSTA_BINARY_FRAME_SIZE environment variable
+    // as the size of the binary buffer, or use a global
+    // default if not present
+    let frame_size = match frame_size_str.parse() {
+        Ok(result) => result,
+        Err(error) => {
+            stderr!("Error! WSTA_BINARY_FRAME_SIZE must be a number: {}", error);
+            log!(1, "Error: {:?}", error);
+            exit(1);
+        }
+    };
+
+    let mut buf: Vec<u8> = vec![0; frame_size];
+    let stdin = io::stdin();
+
+    // Read stdin until buffer is full
+    let read_bytes = match stdin.lock().read(buf.as_mut_slice()) {
+        Ok(read) => read,
+        Err(error) => {
+            match error.kind() {
+                ErrorKind::UnexpectedEof => log!(1, "Stdin reader: EOF in stdin"),
+                _ => {
+                    stderr!("Could not read binary frame from stdin: {}", error);
+                    log!(1, "Error: {:?}", error);
+                }
+            }
+
+            // Read no bytes, return 0
+            0
+        }
+    };
+
+    if read_bytes == 0 {
+      log!(3, "No bytes were read");
+      return
+    }
+
+    log!(3, "Read {} bytes of binary data", read_bytes);
+
+    // If we read less than the buffer size, we need
+    // to shrink it. This is so we avoid sending extra
+    // zeroes in the frames.
+    if read_bytes < frame_size {
+        buf.resize(read_bytes, 0);
+        log!(3, "Resized buffer");
+    }
+
+    if read_bytes > 0 {
+
+        log!(4, "Following binary data was read from stdin: {:?}", buf);
+
+        // Convert to FrameData object
+        let frame_data = FrameData::from_binary_buffer(buf);
+
+        // Insert into stdin_buffer
+        stdin_buffer.lock().unwrap().push(frame_data);
+    }
+}
+
+/// Read UTF-8 from stdin and write it to stdin_buffer
+fn read_as_utf8(stdin_buffer: &Arc<Mutex<Vec<FrameData>>>,
+                echo: bool) {
+
+    let mut string_buf = String::new();
+
+    // Will block until a stdin-line is read
+    match io::stdin().read_line(&mut string_buf) {
+        Ok(_) => {
+
+            // Only send non-empty lines to server
+            if !string_buf.trim().is_empty() {
+
+                // Print when ehco is active
+                if echo {
+                    println!("> {}", string_buf.trim());
+                }
+
+                // Lock and place read string into buffer
+                log!(3, "Placing message into stdin_buffer: {}", string_buf);
+                let frame_data = FrameData::from_utf8(string_buf);
+                stdin_buffer.lock().unwrap().push(frame_data);
+            }
+        },
+        Err(error) => {
+            match error.kind() {
+
+                // Frame is not UTF-8, warn user and abort
+                ErrorKind::InvalidData => {
+                    stderr!("InvalidData. Is input not UTF-8? Use UTF-8 or try binary mode (-b)");
+                    log!(1, "error: {:?}", error);
+                },
+                _ => {
+                    stderr!("error: {}", error);
+                    log!(1, "Error: {:?}", error);
+                }
+            }
+        }
+    }
+}
+
+fn message_to_stdout(message: Message) {
     let owned = message.payload.into_owned();
 
-    return String::from_utf8(owned).unwrap();
+    match String::from_utf8(owned.clone()) {
+        Ok(result) => println!("{}", result),
+        Err(error) => {
+
+            // Failed to parse as UTF-8, assume it is binary
+            log!(2, "Error: {}. Falling back to binary", error);
+            log!(4, "Error: {:?}", error);
+
+            match io::stdout().write(owned.as_ref()) {
+                Err(error) => {
+                    stderr!("Failed to write message to stdout: {}", error);
+                    log!(2, "Error: {:?}", error);
+                    exit(1);
+                },
+                _ => log!(3, "Printing binary frame")
+            }
+        }
+    }
 }
 
