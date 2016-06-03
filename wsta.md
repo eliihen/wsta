@@ -81,19 +81,30 @@
               connect to WebSockets behind a login.
 
 
+       -b, --binary
+              Setting this flag will set wsta into  a  binary  mode.  In  this
+              mode,  wsta will read binary data from stdin and send it in 256B
+              frames to the sever. If larger or smaller frames  are  required,
+              the  WSTA_BINARY_FRAME_SIZE environment variable can be provided
+              to override this.  WSTA_BINARY_FRAME_SIZE is  specified  as  the
+              max  number  of  Bytes in each frame.  Binary data sent from the
+              server is automatically recognized and printed, there is no need
+              to specify this flag when binary output is expected.
+
+
        --follow-redirect
-              Related to the --login option above, this  request  will  change
-              the  default  behavior.  By default --login will not follow HTTP
-              redirects. But if provided  with  the  --follow-redirect  option
+              Related  to  the  --login option above, this request will change
+              the default behavior. By default --login will  not  follow  HTTP
+              redirects.  But  if  provided  with the --follow-redirect option
               wsta will honour any redirects the server requests.
 
 
        -v, --verbose
               Make wsta more verbose. This option will print varying levels of
-              output to stdout. It can be provided up to three times in  order
-              to  log  more  verbose  output. The first level will mostly just
+              output  to stdout. It can be provided up to three times in order
+              to log more verbose output. The first  level  will  mostly  just
               tell you which step wsta is currently executing and provide more
-              detailed  error reports. The two other options are for debugging
+              detailed error reports. The two other options are for  debugging
               purposes.
 
 
@@ -102,8 +113,18 @@
 
 
        -h, --help
-              Shows a helpful message containing all supported  input  parame-
+              Shows  a  helpful message containing all supported input parame-
               ters, then exits.
+
+
+## ENVIRONMENT VARIABLES
+       WSTA_BINARY_FRAME_SIZE
+              If used with  the  --binary  flag,  WSTA_BINARY_FRAME_SIZE  will
+              specify  the maximum size of each binary frame. This is a number
+              in Bytes.  If --binary is used, but this variable  is  not  set,
+              then a default of 256 Bytes will be used.  This may be small for
+              persistent streaming data, and a "overrun!!!" message may  show,
+              in which case simply increase the fame size using this variable.
 
 
 ## EXAMPLES
