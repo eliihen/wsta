@@ -1,8 +1,8 @@
 class Wsta < Formula
   desc "A cli tool written in rust for interfacing with WebSocket services."
   homepage "https://github.com/esphen/wsta"
-  url "https://github.com/esphen/wsta/archive/0.2.1.tar.gz"
-  sha256 "48c2c1a73cab9955df0c2cb494d536e904dafa19a7c8ac7c6dac64ae2cb6240a"
+  url "https://github.com/esphen/wsta/archive/0.3.0.tar.gz"
+  sha256 "63139d9a1833e237ddcc1ae585c1d3a25cce9505f8c83803ad4c3c70d2c2cdb7"
 
   depends_on 'gpg' => :build
   depends_on 'multirust' => :build
