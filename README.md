@@ -2,7 +2,7 @@
 
 The WebSocket Transfer Agent
 
-[![Build Status](https://travis-ci.org/esphen/wsta.svg?branch=rust-everywhere)](https://travis-ci.org/esphen/wsta)
+[![Build Status](https://travis-ci.org/esphen/wsta.svg?branch=master)](https://travis-ci.org/esphen/wsta)
 
 `wsta` is a cli tool written in rust for interfacing with WebSockets. `wsta` has
 the philosophy of being an easy tool to learn and thus gets out of your way to
