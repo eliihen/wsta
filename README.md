@@ -74,6 +74,24 @@ while true; do
 done
 ```
 
+`wsta` also supports binary data usin the `--binary` argument. When provided,
+all data read from stdin is assumed to be in binary format. The following
+simplified example records a binary stream from the microphone and sends it
+continously to the server.
+
+For more information on binary mode, see
+[the manual](https://github.com/esphen/wsta/blob/master/wsta.md) and
+[#5](https://github.com/esphen/wsta/issues/5).
+
+```bash
+$ arecord --format=S16_LE --rate=44100 | wsta -b 'wss://example.com' | jq .results
+"hello "
+"hello this is me "
+"hello this is me talking to "
+"hello this is me talking to people "
+"hello this is me talking to people "
+```
+
 ## Installation
 
 ### Requirements
@@ -100,12 +118,12 @@ then run the following commands. It's going to take a while, please be patient.
     brew tap esphen/wsta https://github.com/esphen/wsta.git
     brew install wsta
 
-You can also find binary releases on the 
+You can also find binary releases on the
 [releases page](https://github.com/esphen/wsta/releases).
 
 ### Other Linux distributions
 I only provide so many Linux distros on OBS, and only 64-bit versions. If your
-computer does not fit into the distros provided, then have a look at the 
+computer does not fit into the distros provided, then have a look at the
 download section of the most recent release, and place the attached binary into
 your `$PATH`.
 
