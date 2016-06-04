@@ -100,11 +100,14 @@ then run the following commands. It's going to take a while, please be patient.
     brew tap esphen/wsta https://github.com/esphen/wsta.git
     brew install wsta
 
-### Other 64-bit Linux distributions
-I only have 64-bit Linux machines available to create binaries with, but if you
-have a 64-bit Linux machine, I do provide the binary in every release here on
-GitHub. Have a look at the most recent release, and place the attached binary
-into your `$PATH`.
+You can also find binary releases on the 
+[releases page](https://github.com/esphen/wsta/releases).
+
+### Other Linux distributions
+I only provide so many Linux distros on OBS, and only 64-bit versions. If your
+computer does not fit into the distros provided, then have a look at the 
+download section of the most recent release, and place the attached binary into
+your `$PATH`.
 
 https://github.com/esphen/wsta/releases
 
