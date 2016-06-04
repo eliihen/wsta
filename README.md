@@ -55,8 +55,8 @@ $ while true; do echo  $(( RANDOM %= 200 )); sleep 0.2; done | wsta ws://echo.we
 ```
 
 Use `wsta` to monitor your websocket uptime. Use the `--ping` option to keep
-the connection alive, and check the exit code for issues. You could also
-potentially send the last few messages with POST data.
+the connection alive, and check the exit code for issues. You can also send
+the last few messages with POST data for a higher quality alert.
 
 ```bash
 #!/bin/bash
@@ -64,20 +64,20 @@ potentially send the last few messages with POST data.
 while true; do
 
   # Start persistent connection, pinging evey 10 seconds to stay alive
-  wsta --ping 10 ws://echo.websocket.org
+  wsta -v --ping 10 ws://echo.websocket.org > messages.txt
 
   if [ $? -gt 0 ]; then
-    curl -X POST https://SOUNDTHEALARM.yourcompany.com
+    tail messages.txt | curl -F "messages=@-" https://SOUNDTHEALARM.yourcompany.com
   fi
 
   sleep 30
 done
 ```
 
-`wsta` also supports binary data usin the `--binary` argument. When provided,
+`wsta` also supports binary data using the `--binary` argument. When provided,
 all data read from stdin is assumed to be in binary format. The following
 simplified example records a binary stream from the microphone and sends it
-continously to the server.
+continously to the server, reading the response JSON as it comes in.
 
 For more information on binary mode, see
 [the manual](https://github.com/esphen/wsta/blob/master/wsta.md) and
