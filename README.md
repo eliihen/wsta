@@ -77,7 +77,8 @@ done
 If you need to load test your server over a WebSocket connection, it is simple
 to write a short bash script to do this. The following example uses a loop to
 continously send messages to the server and saturate the connection as much as
-possible.
+possible. This example could also be ran in parallel as many times as required
+to add more saturated connections to the load test.
 
 ```bash
 #!/bin/bash
