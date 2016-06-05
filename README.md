@@ -74,6 +74,20 @@ while true; do
 done
 ```
 
+If you need to load test your server over websocket, it is simple to write
+a short bash script to do this. The example below uses a loop to continously
+send messages to the server and saturate the connection as much as possible.
+
+```bash
+#!/bin/bash
+
+for i in {1..1000}
+do
+  echo subscribe?giveMeLotsOfData=true
+  echo unsubscribe
+done | wsta ws://echo.websocket.org
+```
+
 `wsta` also supports binary data using the `--binary` argument. When provided,
 all data read from stdin is assumed to be in binary format. The following
 simplified example records a binary stream from the microphone and sends it
