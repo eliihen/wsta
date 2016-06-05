@@ -74,17 +74,18 @@ while true; do
 done
 ```
 
-If you need to load test your server over websocket, it is simple to write
-a short bash script to do this. The example below uses a loop to continously
-send messages to the server and saturate the connection as much as possible.
+If you need to load test your server over a WebSocket connection, it is simple
+to write a short bash script to do this. The following example uses a loop to
+continously send messages to the server and saturate the connection as much as
+possible.
 
 ```bash
 #!/bin/bash
 
 for i in {1..1000}
 do
-  echo subscribe?giveMeLotsOfData=true
-  echo unsubscribe
+  echo subscribe?giveMeLotsOfData=true&id=$i
+  echo unsubscribe?id=$i
 done | wsta ws://echo.websocket.org
 ```
 
