@@ -158,7 +158,7 @@ provides solid tools like `cargo` for automating the compilation. If you compile
 I have only tested Linux, however, so YMMV.
 
     # Install the rust language and tools
-    curl -sSf https://static.rust-lang.org/rustup.sh | sh -s -- --channel=beta
+    curl https://sh.rustup.rs -sSf | sh
 
     # Install gcc and OpenSSL on your OS
     dnf install -y gcc openssl-devel
@@ -171,9 +171,8 @@ I have only tested Linux, however, so YMMV.
 
 [Install the rust language and
 tools](https://doc.rust-lang.org/book/getting-started.html#installing-rust).
-We use some cargo environment variables that are beta features (cargo 0.10).
 
-    curl -sSf https://static.rust-lang.org/rustup.sh | sh -s -- --channel=beta
+    curl https://sh.rustup.rs -sSf | sh
 
 Run the program
 
