@@ -5,12 +5,10 @@ class Wsta < Formula
   sha256 "63139d9a1833e237ddcc1ae585c1d3a25cce9505f8c83803ad4c3c70d2c2cdb7"
 
   depends_on 'gpg' => :build
-  depends_on 'multirust' => :build
+  depends_on 'rust' => :build
   depends_on 'openssl'
 
   def install
-    system "multirust", "update", "beta"
-    system "multirust", "override", "beta"
     system "cargo", "build", "--release"
 
     bin.mkpath
