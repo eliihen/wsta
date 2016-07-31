@@ -3,14 +3,9 @@ environment:
     # This will be used as part of the zipfile name
     PROJECT_NAME: wsta
   matrix:
-    # Stable channel
     - TARGET: i686-pc-windows-gnu
       CHANNEL: stable
-    - TARGET: i686-pc-windows-msvc
-      CHANNEL: stable
     - TARGET: x86_64-pc-windows-gnu
-      CHANNEL: stable
-    - TARGET: x86_64-pc-windows-msvc
       CHANNEL: stable
 
 # Install Rust and Cargo
