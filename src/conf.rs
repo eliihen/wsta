@@ -7,7 +7,6 @@ use std::process::exit;
 use config::reader::from_file;
 use config::types::Config;
 use config::error::ConfigErrorKind::{IoError,ParseError};
-use options::Options;
 
 /// Fetch XDG_CONFIG_HOME from env
 pub fn read_xdg_home() -> Option<String> {
