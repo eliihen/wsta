@@ -60,6 +60,8 @@ pub fn run_wsta(options: &mut Options) {
                  request.headers);
         } else {
             log!(1, "session_cookie object: {:?}", session_cookie);
+
+            // TODO Concat options.cookie_name
             stderr!(concat!("Attempted to fetch session cookie, but no ",
               ".*session.* cookie was found in response's SetCookie header.",
               "Try looking at -I"));

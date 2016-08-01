@@ -12,4 +12,5 @@ argparse = "0.2.1"
 websocket = "0.17.0"
 hyper = "0.9.1"
 cookie = "0.2.4"
+config = "0.1.3"
 

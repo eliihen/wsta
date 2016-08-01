@@ -22,10 +22,12 @@ extern crate websocket;
 extern crate argparse;
 extern crate hyper;
 extern crate cookie;
+extern crate config;
 
 // Needs to be imported first because of log! macro
 #[macro_use]
 mod log;
+mod conf;
 mod frame_data;
 mod program;
 mod http;
@@ -38,21 +40,31 @@ use std::io::Write;
 
 use options::Options;
 
-/// The main entry point of the app
-///
-/// Parses command line options and start the main program
+/// The main entry point of the app.
+/// Parses command line options and starts the main program
 fn main() {
 
-    // Implement default options
-    let mut options = Options::new();
+    // Fetch XDG_CONFIG_HOME from env
+    let xdg_home = conf::read_xdg_home();
+
+    // Read config file
+    let config = conf::read_conf_file(&xdg_home);
+
+    // Get default options from config if config exists,
+    // else use global defaults
+    let mut options = match config {
+        Some(conf) => Options::build_from_config(&conf),
+        None => Options::new()
+    };
+
 
     {  // this block limits scope of borrows by ap.refer() method
         let mut ap = ArgumentParser::new();
 
-        // Requires cargo 0.10 (currently beta)
         ap.set_description(env!("CARGO_PKG_DESCRIPTION"));
 
         ap.refer(&mut options.url)
+            // TODO When !url, Print(help)
             .required()
             .add_argument("url", Store,
                         "URL of the server to connect with");
@@ -76,7 +88,7 @@ fn main() {
 
         ap.refer(&mut options.binary_mode)
             .add_option(&["-b", "--binary"], StoreTrue,
-                        "specify size of binary frames. Default is 5KB");
+                        "enable binary mode");
 
         ap.refer(&mut options.follow_redirect)
             .add_option(&["--follow-redirect"], StoreTrue,
@@ -92,14 +104,10 @@ fn main() {
 
         ap.add_option(&["-V", "--version"],
                       Print(format!("{} {}",
-                                    // Requires cargo 0.10 (currently beta)
                                     env!("CARGO_PKG_NAME"),
                                     env!("CARGO_PKG_VERSION"))
                             ),
                       "print version number and exit");
-
-        ap.refer(&mut options.binary_frame_size)
-            .envvar("WSTA_BINARY_FRAME_SIZE");
 
         ap.refer(&mut options.messages)
             .add_argument("messages", Collect,
@@ -108,8 +116,10 @@ fn main() {
         ap.parse_args_or_exit();
     }
 
+
     // Set log level, no logging before this is possible
     log::set_log_level(options.verbosity);
+    //log!(3, "Parsed config file: {:?}", config);
     log!(3, "Parsed options: {:?}", options);
 
     program::run_wsta(&mut options);

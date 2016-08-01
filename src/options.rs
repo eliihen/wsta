@@ -1,6 +1,8 @@
 //! The command line options provided to the program
 use std::vec::Vec;
 
+use config::types::Config;
+
 #[derive(Debug)]
 pub struct Options {
 
@@ -19,6 +21,10 @@ pub struct Options {
     /// Optional: A GET URL to authenticate with before connecting
     /// to the main url.
     pub login_url: String,
+
+    /// A name to search for when fetching the login cookie from
+    /// the cookies received from the login_url
+    pub login_cookie_name: String,
 
     /// When passed, this flag will cause the program to follow
     /// HTTP GET redirection encountered when calling login_url.
@@ -51,10 +57,12 @@ pub struct Options {
 }
 
 impl Options {
+    /// Build a new Options object with global defaults
     pub fn new() -> Options {
         Options {
             url: String::new(),
             login_url: String::new(),
+            login_cookie_name: String::from("session"),
             follow_redirect: false,
             echo: false,
             verbosity: 0,
@@ -64,6 +72,34 @@ impl Options {
             ping_interval: None,
             binary_mode: false,
             binary_frame_size: String::from("256")
+        }
+    }
+
+    /// Build a new Options object with defaults taken from
+    /// the config file
+    pub fn build_from_config(config: &Config) -> Options {
+
+        let login_cookie_name = config
+            .lookup_str_or("login_cookie_name", "session")
+            .to_string();
+        // TODO make integer
+        let binary_frame_size = config
+            .lookup_str_or("binary_frame_size", "256")
+            .to_string();
+
+        Options {
+            url: String::new(),
+            login_url: String::new(),
+            login_cookie_name: login_cookie_name,
+            follow_redirect: config.lookup_boolean_or("follow_redirect", false),
+            echo: false,
+            verbosity: 0,
+            print_headers: false,
+            headers: Vec::new(),
+            messages: Vec::new(),
+            ping_interval: None,
+            binary_mode: false,
+            binary_frame_size: binary_frame_size,
         }
     }
 }

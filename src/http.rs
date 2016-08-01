@@ -63,7 +63,7 @@ pub fn fetch_session_cookie(options: &Options) -> Option<Cookie> {
                 print_headers("Authenticate response", &res.headers, None);
             }
 
-            return extract_cookie(&res.headers);
+            return extract_cookie(&res.headers, &options.login_cookie_name);
         },
         Err(err) => {
             log!(1, "Error: {:?}", err);
@@ -85,16 +85,19 @@ pub fn print_headers(title: &str, headers: &Headers,
     stderr!("{}\n", headers);
 }
 
-/// Finds the cookie with name matching .*session.* and returns it
-fn extract_cookie(headers: &Headers) -> Option<Cookie> {
+/// Finds the cookie with name matching header_name, or .*session.* if
+/// header_name is not provided. The method then returns that cookie or None
+/// if no cookies matched.
+fn extract_cookie(headers: &Headers, cookie_name: &String) -> Option<Cookie> {
+
     let set_cookie_header = headers.get::<SetCookie>();
     log!(3, "Found SetCookie header: {:?}", set_cookie_header);
+    log!(2, "Searching for cookie with key matching: .*{}.*", cookie_name);
 
     match set_cookie_header {
         Some(header) => {
             for cookie in header.as_slice() {
-
-                if cookie.name.to_lowercase().contains("session") {
+                if cookie.name.to_lowercase().contains(cookie_name) {
                     let pair = CookiePair::new(
                         format!("{}", cookie.name),
                         format!("{}", cookie.value)
@@ -105,7 +108,7 @@ fn extract_cookie(headers: &Headers) -> Option<Cookie> {
                 }
             }
 
-            log!(3, "No cookies matching .*session.*");
+            log!(1, "No cookies matching .*{}.*", cookie_name);
             None
         },
         _ => {
