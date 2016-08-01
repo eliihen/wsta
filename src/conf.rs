@@ -26,7 +26,7 @@ pub fn read_conf_file(xdg_home: &Option<String>) -> Option<Config> {
     let config_folder = if cfg!(windows) {
         String::from("%APPDATA%")
     } else {
-        xdg_home.unwrap_or(String::from("~"))
+        xdg_home.clone().unwrap_or(String::from("~"))
     };
 
     // Assume system is $XDG_CONFIG_HOME compliant
