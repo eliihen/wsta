@@ -23,6 +23,7 @@ extern crate argparse;
 extern crate hyper;
 extern crate cookie;
 extern crate config;
+extern crate xdg;
 
 // Needs to be imported first because of log! macro
 #[macro_use]
@@ -41,14 +42,19 @@ use std::io::Write;
 use options::Options;
 
 /// The main entry point of the app.
-/// Parses command line options and starts the main program
+/// Parses command line options and starts the main program.
+///
+/// The main method first tries to load a config file as the
+/// default runtime options, then falls back to Options::new().
+/// In any case, the user can override the defaults using the
+/// CLI arguments.
 fn main() {
 
-    // Fetch XDG_CONFIG_HOME from env
-    let xdg_home = conf::read_xdg_home();
-
     // Read config file
-    let config = conf::read_conf_file(&xdg_home);
+    let config = conf::read_conf_file();
+
+    // Prepare log of conf until we have parsed verbosity
+    let parsed_conf_log = format!("Parsed config file: {:?}", &config);
 
     // Get default options from config if config exists,
     // else use global defaults
@@ -119,7 +125,7 @@ fn main() {
 
     // Set log level, no logging before this is possible
     log::set_log_level(options.verbosity);
-    //log!(3, "Parsed config file: {:?}", config);
+    log!(3, parsed_conf_log);
     log!(3, "Parsed options: {:?}", options);
 
     program::run_wsta(&mut options);

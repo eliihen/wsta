@@ -97,6 +97,8 @@ fn extract_cookie(headers: &Headers, cookie_name: &String) -> Option<Cookie> {
     match set_cookie_header {
         Some(header) => {
             for cookie in header.as_slice() {
+                // TODO Get ALL cookies and send them with the ws to avoid
+                // even having to specify a name here
                 if cookie.name.to_lowercase().contains(cookie_name) {
                     let pair = CookiePair::new(
                         format!("{}", cookie.name),
