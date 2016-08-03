@@ -3,10 +3,12 @@ use std::io::Write;
 use std::path::PathBuf;
 use std::process::exit;
 
-use xdg::BaseDirectories;
 use config::reader::from_file;
 use config::types::Config;
 use config::error::ConfigErrorKind::{IoError,ParseError};
+
+#[cfg(unix)]
+use xdg::BaseDirectories;
 
 #[cfg(test)]
 use std::fs;
@@ -49,18 +51,16 @@ pub fn read_conf_file() -> Option<Config> {
     }
 }
 
+#[cfg(windows)]
 fn get_config_path() -> Option<PathBuf> {
-    if cfg!(windows) {
-        // TODO Support profiles on windows
-        Some(PathBuf::from("%APPDATA%\\wsta\\wsta.conf"))
-    } else {
-        get_unix_conf_path(None)
-    }
+    // TODO Support profiles on windows
+    Some(PathBuf::from("%APPDATA%\\wsta\\wsta.conf"))
 }
 
 /// Determine the conf file location using the XDG basedir spec, which defaults
 /// to $HOME/.config/wsta/wsta.conf
-fn get_unix_conf_path(profile: Option<String>) -> Option<PathBuf> {
+#[cfg(unix)]
+fn get_config_path(profile: Option<String>) -> Option<PathBuf> {
 
     // TODO Support profiles
     let xdg_dirs_option = match profile {
