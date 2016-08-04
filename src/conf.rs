@@ -25,7 +25,7 @@ use std::path::Path;
 pub fn read_conf_file() -> Option<Config> {
 
     // Lookup config_folder based on OS
-    let conf_path = get_config_path();
+    let conf_path = get_config_path(None);
 
     if conf_path.is_none() {
         return None;
@@ -52,7 +52,7 @@ pub fn read_conf_file() -> Option<Config> {
 }
 
 #[cfg(windows)]
-fn get_config_path() -> Option<PathBuf> {
+fn get_config_path(profile: Option<String>) -> Option<PathBuf> {
     // TODO Support profiles on windows
     Some(PathBuf::from("%APPDATA%\\wsta\\wsta.conf"))
 }
