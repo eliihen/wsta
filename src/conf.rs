@@ -92,7 +92,8 @@ fn config_path_is_read() {
     backup_user_config();
     create_dummy_conf();
 
-    let conf_file = get_config_path().expect("Could not find a config file");
+    let conf_file = get_config_path(None)
+        .expect("Could not find a config file");
 
     assert!(conf_file.is_file());
 
@@ -148,7 +149,7 @@ fn create_dummy_conf() {
 
 #[cfg(test)]
 fn backup_user_config() {
-    let conf_file = get_config_path();
+    let conf_file = get_config_path(None);
 
     if let Some(conf_file) = conf_file {
 
@@ -166,7 +167,7 @@ fn backup_user_config() {
 
 #[cfg(test)]
 fn replace_backup() {
-    let conf_file = get_config_path();
+    let conf_file = get_config_path(None);
 
     if let Some(conf_file) = conf_file {
 
