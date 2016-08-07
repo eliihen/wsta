@@ -18,6 +18,10 @@ use std::fs::{File,DirBuilder};
 use std::env;
 #[cfg(test)]
 use std::path::Path;
+#[cfg(test)]
+use std::thread::sleep;
+#[cfg(test)]
+use std::time::Duration;
 
 /// Reads the configuration file and copies the values into a temporary
 /// options object. The object is the overridden with the parameters
@@ -105,6 +109,10 @@ fn config_path_is_read() {
 
 #[test]
 fn configfile_is_read() {
+
+    // Workaround for tests failing when they are run at the same time
+    sleep(Duration::from_millis(1000));
+
     backup_user_config();
     create_dummy_conf();
 
@@ -161,6 +169,7 @@ fn backup_user_config() {
         if conf_file.exists() && !backup_file.exists() {
             fs::rename(&conf_file, &backup_file)
                 .expect("Failed to backup config file");
+
         }
     }
 }
