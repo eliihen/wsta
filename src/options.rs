@@ -2,6 +2,7 @@
 use std::vec::Vec;
 
 use config::types::Config;
+use conf::{get_str,get_str_or,get_bool,get_vec};
 
 #[derive(Debug)]
 pub struct Options {
@@ -73,24 +74,18 @@ impl Options {
     /// Build a new Options object with defaults taken from
     /// the config file
     pub fn build_from_config(config: &Config) -> Options {
-
-        // TODO make integer
-        let binary_frame_size = config
-            .lookup_str_or("binary_frame_size", "256")
-            .to_string();
-
         Options {
             url: String::new(),
-            login_url: String::new(),
-            follow_redirect: config.lookup_boolean_or("follow_redirect", false),
-            echo: false,
+            login_url: get_str(config, "login_url"),
+            follow_redirect: get_bool(config, "follow_redirect"),
+            echo: get_bool(config, "echo"),
             verbosity: 0,
-            print_headers: false,
-            headers: Vec::new(),
-            messages: Vec::new(),
+            print_headers: get_bool(config, "print_headers"),
+            headers: get_vec(config, "headers"),
+            messages: get_vec(config, "messages"),
             ping_interval: None,
-            binary_mode: false,
-            binary_frame_size: binary_frame_size,
+            binary_mode: get_bool(config, "binary_mode"),
+            binary_frame_size: get_str_or(config, "binary_frame_size", "256"),
         }
     }
 }

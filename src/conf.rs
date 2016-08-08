@@ -2,9 +2,10 @@ use std::io;
 use std::io::Write;
 use std::path::PathBuf;
 use std::process::exit;
+use std::option::Option;
 
 use config::reader::from_file;
-use config::types::Config;
+use config::types::{ScalarValue,Value,Config};
 use config::error::ConfigErrorKind::{IoError,ParseError};
 
 #[cfg(unix)]
@@ -55,9 +56,68 @@ pub fn read_conf_file() -> Option<Config> {
     }
 }
 
+/// Utility method for fetching config as String
+pub fn get_str(config: &Config, key: &str) -> String {
+   config.lookup_str_or(key, "").to_string()
+}
+
+/// Utility method for fetching config as String
+pub fn get_str_or(config: &Config, key: &str, default: &str) -> String {
+   config.lookup_str_or(key, default).to_string()
+}
+
+/// Utility method for fetching config as boolean
+pub fn get_bool(config: &Config, key: &str) -> bool {
+   config.lookup_boolean_or(key, false)
+}
+
+/// Utility method for fetching config as Vec
+pub fn get_vec(config: &Config, key: &str) -> Vec<String> {
+
+    let mut result = Vec::new();
+
+    // CALLBACK HELL, TURN BACK NOW
+    // Lookup key in config
+    match config.lookup(key) {
+        Some(value) => {
+
+            // Lookup array in value in config
+            match value {
+                &Value::Array(ref array) => {
+
+                    // Iterate over values in array
+                    for svalue in array {
+
+                        // Lookup any strings in the array
+                        match svalue {
+                             &Value::Svalue(ScalarValue::Str(ref header)) => {
+                                result.push(format!("{}", header));
+                            },
+                            val => stderr!(concat!("CONFIG ERROR: A key in ",
+                              "the {} array is invalid: {:?}"), key, val)
+                        }
+                    }
+                },
+                val => stderr!(concat!("CONFIG ERROR: A key in the {} array ",
+                  "is invalid: {:?}"), key, val)
+            };
+        },
+
+        // Non-present keys are OK
+        _ => {}
+    };
+
+    result
+}
+
 #[cfg(windows)]
 fn get_config_path(profile: Option<String>) -> Option<PathBuf> {
-    // TODO Support profiles on windows
+
+    // TODO Support profiles
+    if profile.is_some() {
+        unimplemented!();
+    }
+
     Some(PathBuf::from("%APPDATA%\\wsta\\wsta.conf"))
 }
 
