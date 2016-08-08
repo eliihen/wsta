@@ -22,10 +22,6 @@ pub struct Options {
     /// to the main url.
     pub login_url: String,
 
-    /// A name to search for when fetching the login cookie from
-    /// the cookies received from the login_url
-    pub login_cookie_name: String,
-
     /// When passed, this flag will cause the program to follow
     /// HTTP GET redirection encountered when calling login_url.
     pub follow_redirect: bool,
@@ -62,7 +58,6 @@ impl Options {
         Options {
             url: String::new(),
             login_url: String::new(),
-            login_cookie_name: String::from("session"),
             follow_redirect: false,
             echo: false,
             verbosity: 0,
@@ -79,9 +74,6 @@ impl Options {
     /// the config file
     pub fn build_from_config(config: &Config) -> Options {
 
-        let login_cookie_name = config
-            .lookup_str_or("login_cookie_name", "session")
-            .to_string();
         // TODO make integer
         let binary_frame_size = config
             .lookup_str_or("binary_frame_size", "256")
@@ -90,7 +82,6 @@ impl Options {
         Options {
             url: String::new(),
             login_url: String::new(),
-            login_cookie_name: login_cookie_name,
             follow_redirect: config.lookup_boolean_or("follow_redirect", false),
             echo: false,
             verbosity: 0,
