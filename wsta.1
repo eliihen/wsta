@@ -1,11 +1,11 @@
 ." vim: set spell so=8:
-.TH wsta 1 "03 Jun 2016" "0.3.0"
+.TH wsta 1 "11 Aug 2016" "0.3.0"
 .SH NAME
 wsta \- The WebSocket Transfer Agent
 .SH SYNOPSIS
 .B wsta
 .RI [ OPTIONS ]
-.RI URL
+.RI [ URL ]
 .RI [ MESSAGES ...]
 
 .SH DESCRIPTION
@@ -30,8 +30,10 @@ for more info).
 .B wsta
 does not print outgoing frames by default. This is to be as pipe-friendly as
 possible. If you wish to see outgoing frames, the
-.B -e
+.B \-e
 option may be for you.
+
+
 
 .SH EXIT CODES
 .B wsta
@@ -45,30 +47,39 @@ with the server was unexpectedly disconnected, it will return 2.
 .B URL
 The URL to connect to in the format
 .B ws[s]://example.com. This a required argument.
+The argument is not required if provided via a configuration file.
+
+config key: url (String)
 
 .TP
 .B MESSAGES
 The messages to send to the server after connection has been established.
 
+config key: messages (Array<String>)
+
 .SH OPTIONS
 
 .TP
-.B -H, --header HEADER
+.B \-H, \-\-header HEADER
 This option will add a custom header to the WebSocket request. This can be any
 HTTP header and value, as well as custom ones. The input is expected to be in
 the format of
 .B key:value.
 If this format is not encountered, the header will not be added.
 
+config key: headers (Array<String>)
+
 .TP
-.B -I, --head
+.B \-I, \-\-head
 Print the headers of requests and responses that are sent to stdout, including
 any and all headers of said requests. This is very useful for debugging why
 .B wsta
 is not able to connect to a server, as you will see the response code it sent.
 
+config key: print_headers (Boolean)
+
 .TP
-.B -p, --ping SECONDS
+.B \-p, \-\-ping SECONDS
 Send "ping" frames to the server every
 .B SECONDS
 seconds. This is helpful if you want to have a an automated script with a
@@ -76,18 +87,20 @@ constant connection to the server without getting disconnected, for example to
 monitor uptime.
 
 .TP
-.B -e, --echo
+.B \-e, \-\-echo
 By default,
 .B wsta
 does not echo outgoing frames. This is to be as pipe-friendly as possible. By
 providing the
-.B -e
+.B \-e
 options, you can tell
 .B wsta
 to echo outgoing frames to stdout as well.
 
+config key: echo (Boolean)
+
 .TP
-.B -l, --login URL
+.B \-l, \-\-login URL
 Passing this parameter will make
 .B wsta
 send an HTTP GET request before connecting to the WebSocket. This request is
@@ -98,8 +111,10 @@ placed into the WebSocket request. Using this method,
 .B wsta
 can connect to WebSockets behind a login.
 
+config key: login_url (String)
+
 .TP
-.B -b, --binary
+.B \-b, \-\-binary
 Setting this flag will set
 .B wsta
 into a binary mode. In this mode,
@@ -113,20 +128,24 @@ is specified as the max number of Bytes in each frame.
 Binary data sent from the server is automatically recognized and printed, there
 is no need to specify this flag when binary output is expected.
 
+config key: binary_mode (Boolean)
+
 .TP
-.B --follow-redirect
+.B \-\-follow\-redirect
 Related to the
-.B --login
+.B \-\-login
 option above, this request will change the default behavior. By default
-.B --login
+.B \-\-login
 will not follow HTTP redirects. But if provided with the
-.B --follow-redirect
+.B \-\-follow\-redirect
 option
 .B wsta
 will honour any redirects the server requests.
 
+config key: follow_redirect (Boolean)
+
 .TP
-.B -v, --verbose
+.B \-v, \-\-verbose
 Make
 .B wsta
 more verbose. This option will print varying levels of output to stdout. It can
@@ -137,51 +156,94 @@ is currently executing and provide more detailed error reports. The two other
 options are for debugging purposes.
 
 .TP
-.B -V, --version
+.B \-V, \-\-version
 Show the installed version of
 .B wsta,
 then exits.
 
 .TP
-.B -h, --help
+.B \-h, \-\-help
 Shows a helpful message containing all supported input parameters, then exits.
 
-.SH ENVIRONMENT VARIABLES
+.SH CONFIGURATION OPTIONS
+Some options are not configurable as a command line argument, only as part of a
+configuration file. These options are listed here
 
 .TP
-.B WSTA_BINARY_FRAME_SIZE
+.B binary_frame_size
 If used with the
-.B --binary
+.B \-\-binary
 flag,
-.B WSTA_BINARY_FRAME_SIZE
+.B binary_frame_size
 will specify the maximum size of each binary frame. This is a number in Bytes.
 If
-.B --binary
+.B \-\-binary
 is used, but this variable is not set, then a default of 256 Bytes will be used.
 This may be small for persistent streaming data, and a "overrun!!!" message may
 show, in which case simply increase the fame size using this variable.
 
+config key: binary_frame_size (String)
+
 .SH EXAMPLES
+More examples can be found in the README.
 
 .TP
 .B wsta ws://echo.websocket.org ping
 Send a ping frame to a server and see the response printed to stdout.
 
 .TP
-.B wsta -I -v ws://test.example.com
+.B wsta \-I \-v ws://test.example.com
 Show more information about an error, as well as any headers send and received.
 In this case we can see "failed to lookup address", which means it is an invalid
 URL.
 
+.SH FILES
+There is the possibility to configure
+.B wsta's
+behavior using configuration files. The options above specify what the option
+keys in the configuration files are. If both a command line argument and the
+equivalent option is configured in a configuration file, the command line
+argument is used.
+
+Windows users can replace
+.I $XDG_CONFIG_HOME
+below with
+.I %APPDATA%.
+
+The syntax of the configuration files are as follows:
+
+.EX
+url = "ws://echo.websocket.org";
+headers = ["Origin:google.com","Foo:Bar"];
+show_headers = true;
+.EE
+
+.TP
+.I $XDG_CONFIG_HOME/wsta/wsta.conf
+The main configuration file used if no profile is specified.
+
+.TP
+.I $XDG_CONFIG_HOME/wsta/<profile_name>/wsta.conf
+Any profiles are simply fonders inside the
+.B wsta
+config directory. Any files names
+.B wsta.conf
+placed in the config directory can later be loaded using
+.B \-p <profile_name>.
+
+
+.SH AUTHOR
+Written with love by Espen Henriksen and contributors.
+
 
 .SH BUGS
 When submitting bugs, please provide as verbose output as possible. This can be
-done using a combination og
-.B -vvv
+done using a combination of
+.B \-vvv
 and
-.B -I.
+.B \-I.
 Please also provide the output of
-.B wsta --version.
+.B wsta \-\-version.
 You should also provide a public server which you can consistently reproduce
 your issue against, as well as the exact word-for-word command which reproduces
 the issue. If the only server you can reproduce against is private, feel free to
