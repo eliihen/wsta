@@ -113,12 +113,13 @@ fn get_config_path(profile: Option<String>) -> Option<PathBuf> {
 
     let mut path = PathBuf::from("%APPDATA%");
 
-    // TODO Support profiles
     if profile.is_some() {
-        path.push(profile);
+        path.push(profile.unwrap());
     }
 
-    Some(path.push("wsta.conf"))
+    path.push("wsta.conf");
+
+    Some(path)
 }
 
 /// Determine the conf file location using the XDG basedir spec, which defaults
@@ -129,7 +130,6 @@ fn get_config_path(profile: Option<String>) -> Option<PathBuf> {
 #[cfg(unix)]
 fn get_config_path(profile: Option<String>) -> Option<PathBuf> {
 
-    // TODO Support profiles
     let xdg_dirs_option = match profile {
         Some(p) => BaseDirectories::with_profile(env!("CARGO_PKG_NAME"), p),
         None => BaseDirectories::with_prefix(env!("CARGO_PKG_NAME"))
