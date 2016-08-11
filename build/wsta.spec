@@ -20,10 +20,10 @@ bash scripts as you see fit.
 %prep
 %setup
 # Extract rust
-mkdir $RPM_SOURCE_DIR/rust-beta
-tar -xzf $RPM_SOURCE_DIR/rust-beta-$RPM_ARCH-unknown-linux-gnu.tar.gz -C $RPM_SOURCE_DIR/rust-beta --strip-components 1
+mkdir $RPM_SOURCE_DIR/rust
+tar -xzf rust-1.*-$RPM_ARCH-unknown-linux-gnu.tar.gz -C $RPM_SOURCE_DIR/rust --strip-components 1
 # Install rust
-sh $RPM_SOURCE_DIR/rust-beta/install.sh --without="rust-docs" --prefix="$RPM_SOURCE_DIR" --disable-ldconfig
+sh $RPM_SOURCE_DIR/rust/install.sh --without="rust-docs" --prefix="$RPM_SOURCE_DIR" --disable-ldconfig
 
 
 %build
