@@ -255,9 +255,7 @@ fn config_profile_works() {
 
     let profile_name = String::from("wsta_test_profile");
 
-    let conf_file = format!("%APPDATA%\\.config\\wsta\\{}\\wsta.conf",
-        &profile_name
-    );
+    let conf_file = format!("%APPDATA%\\wsta\\{}\\wsta.conf", &profile_name);
 
     create_dummy_conf(Some(conf_file));
 
