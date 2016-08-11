@@ -59,3 +59,4 @@ deploy:
 branches:
   only:
     - master
+    - appveyor
