@@ -85,9 +85,9 @@ pub fn print_headers(title: &str, headers: &Headers,
     stderr!("{}\n", headers);
 }
 
-/// Finds the cookie with name matching header_name, or .*session.* if
-/// header_name is not provided. The method then returns that cookie or None
-/// if no cookies matched.
+/// Looks up the SetCookie header of the Headers set, and maps
+/// those headers into a consumable set of CookiePairs. It will
+/// return None of no SetCookie header was found.
 fn extract_cookie(headers: &Headers) -> Option<Cookie> {
 
     let set_cookie_header = headers.get::<SetCookie>();

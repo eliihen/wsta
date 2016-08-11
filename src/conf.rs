@@ -138,8 +138,6 @@ fn get_config_path(profile: Option<String>) -> Option<PathBuf> {
     let xdg_dirs = match xdg_dirs_option {
         Ok(val) => val,
         Err(_) => {
-            println!("Not present");
-
             log!(3, "XDG application data not present");
             return None
         }

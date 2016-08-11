@@ -84,7 +84,6 @@ fn main() {
         // Required, but we don't use ArgumentParser's required, as it
         // can be provided from a configuration file
         ap.refer(&mut options.url)
-            // TODO When !url, Print(help)
             .add_argument("url", Store,
                         "URL of the server to connect with");
 
