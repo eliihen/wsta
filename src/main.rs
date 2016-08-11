@@ -29,6 +29,7 @@ extern crate xdg;
 #[macro_use]
 mod log;
 mod conf;
+mod args;
 mod frame_data;
 mod program;
 mod http;
@@ -39,6 +40,7 @@ use argparse::*;
 use std::io;
 use std::io::Write;
 
+use args::get_profile;
 use options::Options;
 
 /// The main entry point of the app.
@@ -50,11 +52,17 @@ use options::Options;
 /// CLI arguments.
 fn main() {
 
+    // Read the provided configuration profile from args, if any
+    let profile = get_profile();
+
+    // Prepare log of profile name until we have parsed verbosity
+    let parsed_profile_log = format!("Parsed profile as: {:?}", &profile);
+
     // Read config file
-    let config = conf::read_conf_file();
+    let config = conf::read_conf_file(profile);
 
     // Prepare log of conf until we have parsed verbosity
-    let parsed_conf_log = format!("Parsed config file: {:?}", &config);
+    let parsed_conf_log = format!("Parsed config file as: {:?}", &config);
 
     // Get default options from config if config exists,
     // else use global defaults
@@ -65,6 +73,7 @@ fn main() {
 
 
     {  // this block limits scope of borrows by ap.refer() method
+        let mut dummy = String::new();
         let mut ap = ArgumentParser::new();
 
         ap.set_description(env!("CARGO_PKG_DESCRIPTION"));
@@ -104,6 +113,12 @@ fn main() {
             .add_option(&["-e", "--echo"], StoreTrue,
                         "echo outgoing frames");
 
+        // This is a dummy entry for --help - the actual profile is read before
+        // ArgumentParser is invoked
+        ap.refer(&mut dummy)
+            .add_option(&["-p"], Store,
+                        "use a different configuration profile");
+
         ap.refer(&mut options.verbosity)
             .add_option(&["-v", "--verbose"], IncrBy(1),
                         "increase the verbosity level by one");
@@ -125,8 +140,9 @@ fn main() {
 
     // Set log level, no logging before this is possible
     log::set_log_level(options.verbosity);
+    log!(3, parsed_profile_log);
     log!(3, parsed_conf_log);
-    log!(3, "Parsed options: {:?}", options);
+    log!(3, "Resulting options: {:?}", options);
 
     program::run_wsta(&mut options);
 }

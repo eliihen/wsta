@@ -8,29 +8,22 @@ use config::reader::from_file;
 use config::types::{ScalarValue,Value,Config};
 use config::error::ConfigErrorKind::{IoError,ParseError};
 
-#[cfg(unix)]
-use xdg::BaseDirectories;
+#[cfg(unix)] use xdg::BaseDirectories;
 
-#[cfg(test)]
-use std::fs;
-#[cfg(test)]
-use std::fs::{File,DirBuilder};
-#[cfg(test)]
-use std::env;
-#[cfg(test)]
-use std::path::Path;
-#[cfg(test)]
-use std::thread::sleep;
-#[cfg(test)]
-use std::time::Duration;
+#[cfg(test)] use std::fs;
+#[cfg(test)] use std::fs::{File,DirBuilder};
+#[cfg(test)] use std::env;
+#[cfg(test)] use std::path::Path;
+#[cfg(test)] use std::thread::sleep;
+#[cfg(test)] use std::time::Duration;
 
 /// Reads the configuration file and copies the values into a temporary
 /// options object. The object is the overridden with the parameters
 /// specified on the command line.
-pub fn read_conf_file() -> Option<Config> {
+pub fn read_conf_file(profile: Option<String>) -> Option<Config> {
 
     // Lookup config_folder based on OS
-    let conf_path = get_config_path(None);
+    let conf_path = get_config_path(profile);
 
     if conf_path.is_none() {
         return None;
@@ -110,25 +103,35 @@ pub fn get_vec(config: &Config, key: &str) -> Vec<String> {
     result
 }
 
+/// Determine the conf file location using the special %APPDATA% directory of
+/// windows.
+///
+/// Supports profiles, i.e. `-p someapp` resolves to
+/// %APPDATA%/wsta/someapp/wsta.conf
 #[cfg(windows)]
 fn get_config_path(profile: Option<String>) -> Option<PathBuf> {
 
+    let mut path = PathBuf::from("%APPDATA%");
+
     // TODO Support profiles
     if profile.is_some() {
-        unimplemented!();
+        path.push(profile);
     }
 
-    Some(PathBuf::from("%APPDATA%\\wsta\\wsta.conf"))
+    Some(path.push("wsta.conf"))
 }
 
 /// Determine the conf file location using the XDG basedir spec, which defaults
 /// to $HOME/.config/wsta/wsta.conf
+///
+/// Supports profiles, i.e. `-p someapp` resolves to
+/// XDG_CONF_DIR/wsta/someapp/wsta.conf
 #[cfg(unix)]
 fn get_config_path(profile: Option<String>) -> Option<PathBuf> {
 
     // TODO Support profiles
     let xdg_dirs_option = match profile {
-        Some(_) => unimplemented!(),
+        Some(p) => BaseDirectories::with_profile(env!("CARGO_PKG_NAME"), p),
         None => BaseDirectories::with_prefix(env!("CARGO_PKG_NAME"))
     };
 
