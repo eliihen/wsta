@@ -111,7 +111,7 @@ pub fn get_vec(config: &Config, key: &str) -> Vec<String> {
 #[cfg(windows)]
 fn get_config_path(profile: Option<String>) -> Option<PathBuf> {
 
-    let mut path = PathBuf::from("%APPDATA%");
+    let mut path = PathBuf::from("%APPDATA%\\wsta");
 
     if profile.is_some() {
         path.push(profile.unwrap());
@@ -288,6 +288,7 @@ fn create_dummy_conf(conf_file_override: Option<String>) {
     } else {
         get_test_conf_path()
     };
+
     let directory = conf_file.clone();
     let directory = directory.parent().unwrap();
 
