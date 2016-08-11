@@ -1,3 +1,12 @@
+wsta (0.4.0-0) stable; urgency=low
+
+ * Add support for config files and profiles
+ * Use all headers from SetCookie when using --login
+ * Add windows support
+ * Update dependencies
+
+ -- Espen Henriksen <dev+wsta@henriksen.is> Thu, 11 Aug 2016 23:01:00 +0200
+
 wsta (0.3.0-0) stable; urgency=low
 
  * Add support for binary data

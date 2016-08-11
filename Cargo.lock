@@ -1,6 +1,6 @@
 [root]
 name = "wsta"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "argparse 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "config 0.1.3 (registry+https://github.com/rust-lang/crates.io-index)",

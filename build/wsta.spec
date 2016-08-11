@@ -1,5 +1,5 @@
 Name:           wsta
-Version:        0.3.0
+Version:        0.4.0
 Release:        1%{?dist}
 Summary:        The WebSocket Transfer Agent
 
@@ -49,6 +49,11 @@ cp -v wsta.1 $RPM_BUILD_ROOT/usr/local/share/man/man1/wsta.1
 
 
 %changelog
+* Thu Aug 11 2016 Espen Henriksen <dev+wsta@henriksen.is>
+- Add support for config files and profiles
+- Use all headers from SetCookie when using --login
+- Add windows support
+- Update dependencies
 * Fri Jun 03 2016 Espen Henriksen <dev+wsta@henriksen.is>
 - Add support for binary data
 - Only frames are printed to stdout, rest is now stderr

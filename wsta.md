@@ -213,4 +213,4 @@ wsta(1)                     General Commands Manual                    wsta(1)
 
 
 
-0.3.0                             11 Aug 2016                          wsta(1)
+0.4.0                             11 Aug 2016                          wsta(1)
