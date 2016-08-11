@@ -186,6 +186,28 @@ fn configfile_is_read() {
     replace_backup();
 }
 
+#[test]
+fn get_vec_works() {
+    // Workaround for tests failing when they are run at the same time
+    sleep(Duration::from_millis(2000));
+
+    backup_user_config();
+    create_dummy_conf();
+
+    let conf = read_conf_file().expect("Could not read config file");
+
+    // Assert is parsed properly
+    let key_name = "headers";
+    let result = get_vec(&conf, &key_name);
+    assert_eq!(result, vec!["Foo:Bar"]);
+
+    let key_name = "ricepudding";
+    let result = get_vec(&conf, &key_name);
+    assert_eq!(result, Vec::<String>::new());
+
+    replace_backup();
+}
+
 #[cfg(test)]
 fn create_dummy_conf() {
 
@@ -208,7 +230,7 @@ fn create_dummy_conf() {
     // Create dummy conf
     let mut f = File::create(&conf_file)
         .expect("Could not create dummy conf file");
-    f.write_all(b"login_cookie_name = \"testing\";")
+    f.write_all(b"login_cookie_name = \"testing\";\nheaders=[\"Foo:Bar\"];")
         .expect("Could not write dummy config file");
     f.sync_all().expect("Could not sync writes to system");
 
