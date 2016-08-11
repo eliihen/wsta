@@ -39,6 +39,8 @@ mod options;
 use argparse::*;
 use std::io;
 use std::io::Write;
+use std::process::exit;
+use std::str::from_utf8;
 
 use args::get_profile;
 use options::Options;
@@ -71,6 +73,7 @@ fn main() {
         None => Options::new()
     };
 
+    let mut help_text = Vec::<u8>::new();
 
     {  // this block limits scope of borrows by ap.refer() method
         let mut dummy = String::new();
@@ -78,9 +81,10 @@ fn main() {
 
         ap.set_description(env!("CARGO_PKG_DESCRIPTION"));
 
+        // Required, but we don't use ArgumentParser's required, as it
+        // can be provided from a configuration file
         ap.refer(&mut options.url)
             // TODO When !url, Print(help)
-            .required()
             .add_argument("url", Store,
                         "URL of the server to connect with");
 
@@ -113,9 +117,10 @@ fn main() {
             .add_option(&["-e", "--echo"], StoreTrue,
                         "echo outgoing frames");
 
-        // This is a dummy entry for --help - the actual profile is read before
-        // ArgumentParser is invoked
+        // This is a dummy entry used in --help - the actual profile is read
+        // before ArgumentParser is invoked
         ap.refer(&mut dummy)
+            .metavar("NAME")
             .add_option(&["-p"], Store,
                         "use a different configuration profile");
 
@@ -134,7 +139,22 @@ fn main() {
             .add_argument("messages", Collect,
                           r#"message(s) to send after connecting"#);
 
+        ap.print_help(env!("CARGO_PKG_NAME"), &mut help_text)
+            .expect("Could not write help text to buffer! File a bug!");
+
         ap.parse_args_or_exit();
+    }
+
+    // Check if url is empty manually, as the user may enter
+    // it either as an argument or via a configuration file
+    if options.url.is_empty() {
+        stderr!("{}: You need to enter a URL", env!("CARGO_PKG_NAME"));
+
+        let help_text = from_utf8(&help_text[..])
+            .expect("Could not read help text from buffer! File a bug!")
+            .to_string();
+        stderr!("{}", help_text);
+        exit(1);
     }
 
 

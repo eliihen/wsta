@@ -75,7 +75,7 @@ impl Options {
     /// the config file
     pub fn build_from_config(config: &Config) -> Options {
         Options {
-            url: String::new(),
+            url: get_str(config, "url"),
             login_url: get_str(config, "login_url"),
             follow_redirect: get_bool(config, "follow_redirect"),
             echo: get_bool(config, "echo"),
@@ -85,6 +85,7 @@ impl Options {
             messages: get_vec(config, "messages"),
             ping_interval: None,
             binary_mode: get_bool(config, "binary_mode"),
+            // TODO Make int
             binary_frame_size: get_str_or(config, "binary_frame_size", "256"),
         }
     }
