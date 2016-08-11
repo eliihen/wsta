@@ -157,7 +157,7 @@ fn get_config_path(profile: Option<String>) -> Option<PathBuf> {
 #[test]
 fn config_path_is_read() {
     backup_user_config();
-    create_dummy_conf();
+    create_dummy_conf(None);
 
     let conf_file = get_config_path(None)
         .expect("Could not find a config file");
@@ -177,9 +177,9 @@ fn configfile_is_read() {
     sleep(Duration::from_millis(1000));
 
     backup_user_config();
-    create_dummy_conf();
+    create_dummy_conf(None);
 
-    let conf = read_conf_file().expect("Could not read config file");
+    let conf = read_conf_file(None).expect("Could not read config file");
 
     // Assert is parsed properly
     let result: &str = conf.lookup_str("login_cookie_name")
@@ -195,9 +195,9 @@ fn get_vec_works() {
     sleep(Duration::from_millis(2000));
 
     backup_user_config();
-    create_dummy_conf();
+    create_dummy_conf(None);
 
-    let conf = read_conf_file().expect("Could not read config file");
+    let conf = read_conf_file(None).expect("Could not read config file");
 
     // Assert is parsed properly
     let key_name = "headers";
@@ -211,10 +211,83 @@ fn get_vec_works() {
     replace_backup();
 }
 
-#[cfg(test)]
-fn create_dummy_conf() {
+#[test]
+#[cfg(unix)]
+fn config_profile_works() {
+    // Workaround for tests failing when they are run at the same time
+    sleep(Duration::from_millis(3000));
 
-    let conf_file = get_test_conf_path();
+    let profile_name = String::from("wsta_test_profile");
+
+    let conf_file = format!("{}/.config/wsta/{}/wsta.conf",
+        env::home_dir()
+          .expect("Could not fetch home dir for test!")
+          .display(),
+        &profile_name
+    );
+
+    create_dummy_conf(Some(conf_file));
+
+    let conf = read_conf_file(Some(profile_name))
+        .expect("Could not read config file");
+
+    // Assert is parsed properly
+    let result: &str = conf.lookup_str("login_cookie_name")
+      .expect("Could not find login_cookie_name in the config file");
+    assert_eq!(result, "testing");
+
+    let key_name = "headers";
+    let result = get_vec(&conf, &key_name);
+    assert_eq!(result, vec!["Foo:Bar"]);
+
+    let key_name = "ricepudding";
+    let result = get_vec(&conf, &key_name);
+    assert_eq!(result, Vec::<String>::new());
+
+    replace_backup();
+}
+
+#[test]
+#[cfg(windows)]
+fn config_profile_works() {
+    // Workaround for tests failing when they are run at the same time
+    sleep(Duration::from_millis(3000));
+
+    let profile_name = String::from("wsta_test_profile");
+
+    let conf_file = format!("%APPDATA%\\.config\\wsta\\{}\\wsta.conf",
+        &profile_name
+    );
+
+    create_dummy_conf(Some(conf_file));
+
+    let conf = read_conf_file(Some(profile_name))
+        .expect("Could not read config file");
+
+    // Assert is parsed properly
+    let result: &str = conf.lookup_str("login_cookie_name")
+      .expect("Could not find login_cookie_name in the config file");
+    assert_eq!(result, "testing");
+
+    let key_name = "headers";
+    let result = get_vec(&conf, &key_name);
+    assert_eq!(result, vec!["Foo:Bar"]);
+
+    let key_name = "ricepudding";
+    let result = get_vec(&conf, &key_name);
+    assert_eq!(result, Vec::<String>::new());
+
+    replace_backup();
+}
+
+#[cfg(test)]
+fn create_dummy_conf(conf_file_override: Option<String>) {
+
+    let conf_file = if conf_file_override.is_some() {
+        PathBuf::from(conf_file_override.unwrap())
+    } else {
+        get_test_conf_path()
+    };
     let directory = conf_file.clone();
     let directory = directory.parent().unwrap();
 
