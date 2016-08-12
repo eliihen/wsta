@@ -1,3 +1,9 @@
+wsta (0.4.1-0) stable; urgency=low
+
+ * Fix argument conflict - profile argument -p is now -P
+
+ -- Espen Henriksen <dev+wsta@henriksen.is> Fri, 12 Aug 2016 18:37:00 +0200
+
 wsta (0.4.0-0) stable; urgency=low
 
  * Add support for config files and profiles

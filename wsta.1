@@ -1,5 +1,5 @@
 ." vim: set spell so=8:
-.TH wsta 1 "11 Aug 2016" "0.4.0"
+.TH wsta 1 "12 Aug 2016" "0.4.1"
 .SH NAME
 wsta \- The WebSocket Transfer Agent
 .SH SYNOPSIS
@@ -74,7 +74,7 @@ config key: headers (Array<String>)
 Print the headers of requests and responses that are sent to stdout, including
 any and all headers of said requests. This is very useful for debugging why
 .B wsta
-is not able to connect to a server, as you will see the response code it sent.
+is not able to connect to a server, as you will see the response codes sent.
 
 config key: print_headers (Boolean)
 
@@ -145,15 +145,31 @@ will honour any redirects the server requests.
 config key: follow_redirect (Boolean)
 
 .TP
+.B \-P NAME
+Tell
+.B wsta
+to use a configuration profile for this connection only. The name of the profile
+is the name of the folder in
+.I $XDG_CONFIG_HOME/wsta
+where the file that is to be loaded is located.
+
+If you want a profile to be used without
+.B \-P,
+use the file
+.I $XDG_CONFIG_HOME/wsta/wsta.conf.
+
+Also see the
+.B FILES
+section.
+
+.TP
 .B \-v, \-\-verbose
 Make
 .B wsta
 more verbose. This option will print varying levels of output to stdout. It can
-be provided up to three times in order to log more verbose output. The first
-level will mostly just tell you which step
-.B wsta
-is currently executing and provide more detailed error reports. The two other
-options are for debugging purposes.
+be provided up to four times in order to log more verbose output. The first
+level will mostly just provide more detailed error reports. The other levels
+are for debugging purposes.
 
 .TP
 .B \-V, \-\-version
@@ -210,6 +226,10 @@ Windows users can replace
 below with
 .I %APPDATA%.
 
+$XDG_CONFIG_HOME on unix systems defaults the
+.I ~/.config
+directory.
+
 The syntax of the configuration files are as follows:
 
 .EX
@@ -217,6 +237,13 @@ url = "ws://echo.websocket.org";
 headers = ["Origin:google.com","Foo:Bar"];
 show_headers = true;
 .EE
+
+Where url is a
+.B String,
+headers is an
+.B Array
+and show_headers is a
+.B Boolean.
 
 .TP
 .I $XDG_CONFIG_HOME/wsta/wsta.conf
@@ -229,7 +256,7 @@ Any profiles are simply fonders inside the
 config directory. Any files names
 .B wsta.conf
 placed in the config directory can later be loaded using
-.B \-p <profile_name>.
+.B \-P <profile_name>.
 
 
 .SH AUTHOR

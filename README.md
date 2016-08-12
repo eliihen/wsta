@@ -109,6 +109,29 @@ $ arecord --format=S16_LE --rate=44100 | wsta -b 'wss://example.com' | jq .resul
 "hello this is me talking to people "
 ```
 
+## Configuration profiles
+
+A neat feature of `wsta` is the ability to have several separate configuration
+profiles. Configuration profiles are basically presets of CLI arguments like
+urls and headers saved to a file for easy reuse at a later point.
+
+If you have web services in different environments, you might for example want
+to have a `foo-dev` and `foo-prod` configuration file. This makes it easy to at
+a later date connect to `foo` by simply running `wsta -P foo-dev`,
+
+These files could be checked into VCS and shared between colleagues.
+
+An example of a configuration file:
+
+```C
+url = "ws://echo.websocket.org";
+headers = ["Origin:google.com", "Foo:Bar"];
+show_headers = true;
+```
+
+See [the manual](https://github.com/esphen/wsta/blob/master/wsta.md) for more
+information.
+
 ## Installation
 
 ### Requirements
@@ -126,7 +149,7 @@ https://software.opensuse.org/download.html?project=home%3Aesphen&package=wsta
 I'm working on getting more distributions, as well as 32-bit into the Open Build
 Service pipeline, which is what creates the releases on that page. For now, you
 need a 64-bit system to use that page. If you don't use a 64-bit system, have a
-look below at compiling it yourself.
+look below at binaries or compiling it yourself.
 
 ### Mac OS X
 To install on Max OS X, ensure you have [homebrew](http://brew.sh) installed,
@@ -148,7 +171,12 @@ https://github.com/esphen/wsta/releases
 
 ### Windows
 
-See "Compile it yourself".
+Windows binaries are compiled for each release. Ensure you have a command
+prompt with GNU libraries, for example the `git` prompt, and run the provided
+binary file from there.
+
+You can find binary releases on the
+[releases page](https://github.com/esphen/wsta/releases).
 
 ### Compile it yourself
 
@@ -156,7 +184,6 @@ DON'T PANIC. It's really easy to compile and install `wsta` yourself! Rust
 provides solid tools like `cargo` for automating the compilation. If you compile
 `wsta` yourself, it should run on all of
 [rust's supported platforms](https://doc.rust-lang.org/book/getting-started.html#platform-support).
-I have only tested Linux, however, so YMMV.
 
     # Install the rust language and tools
     curl https://sh.rustup.rs -sSf | sh
@@ -164,7 +191,7 @@ I have only tested Linux, however, so YMMV.
     # Install gcc and OpenSSL on your OS
     dnf install -y gcc openssl-devel
 
-    # Install wsta to `$CARGO_HOME` if set or `$HOME/.cargo`
+    # Install wsta to `$HOME/.cargo` or `$CARGO_HOME` if set.
     # To change the install path, try setting --root to a directory like /usr/local
     cargo install --git https://github.com/esphen/wsta.git
 
