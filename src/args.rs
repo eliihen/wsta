@@ -6,13 +6,11 @@ use std::env;
 /// invoked (to init options).
 /// This method is not perfect - it would be hard to support
 /// both `--profile test` and `--profile=test`, for example, so
-/// we keep it simple and only support -p
+/// we keep it simple and only support -P
 pub fn get_profile() -> Option<String> {
 
-    // Find the position of -p
-    let pos = env::args().position(|a| {
-        a == "-p"
-    });
+    // Find the position of -P
+    let pos = env::args().position(|a| a == "-P");
 
     // Get the next arg as the value
     if pos.is_some() {

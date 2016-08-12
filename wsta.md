@@ -118,13 +118,13 @@ wsta(1)                     General Commands Manual                    wsta(1)
               config key: follow_redirect (Boolean)
 
 
-       -p NAME
+       -P NAME
               Tell  wsta  to  use  a configuration profile for this connection
               only. The name of the profile is  the  name  of  the  folder  in
               $XDG_CONFIG_HOME/wsta  where  the  file  that is to be loaded is
               located.
 
-              If you want a profile to  be  used  without  -p,  use  the  file
+              If you want a profile to  be  used  without  -P,  use  the  file
               $XDG_CONFIG_HOME/wsta/wsta.conf.
 
               Also see the FILES section.
@@ -206,7 +206,7 @@ wsta(1)                     General Commands Manual                    wsta(1)
        $XDG_CONFIG_HOME/wsta/<profile_name>/wsta.conf
               Any profiles are simply fonders inside the  wsta  config  direc-
               tory.  Any  files names wsta.conf placed in the config directory
-              can later be loaded using -p <profile_name>.
+              can later be loaded using -P <profile_name>.
 
 
 

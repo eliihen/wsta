@@ -120,7 +120,7 @@ fn main() {
         // before ArgumentParser is invoked
         ap.refer(&mut dummy)
             .metavar("NAME")
-            .add_option(&["-p"], Store,
+            .add_option(&["-P"], Store,
                         "use a different configuration profile");
 
         ap.refer(&mut options.verbosity)

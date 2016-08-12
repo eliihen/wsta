@@ -106,7 +106,7 @@ pub fn get_vec(config: &Config, key: &str) -> Vec<String> {
 /// Determine the conf file location using the special %APPDATA% directory of
 /// windows.
 ///
-/// Supports profiles, i.e. `-p someapp` resolves to
+/// Supports profiles, i.e. `-P someapp` resolves to
 /// %APPDATA%/wsta/someapp/wsta.conf
 #[cfg(windows)]
 fn get_config_path(profile: Option<String>) -> Option<PathBuf> {
@@ -125,7 +125,7 @@ fn get_config_path(profile: Option<String>) -> Option<PathBuf> {
 /// Determine the conf file location using the XDG basedir spec, which defaults
 /// to $HOME/.config/wsta/wsta.conf
 ///
-/// Supports profiles, i.e. `-p someapp` resolves to
+/// Supports profiles, i.e. `-P someapp` resolves to
 /// XDG_CONF_DIR/wsta/someapp/wsta.conf
 #[cfg(unix)]
 fn get_config_path(profile: Option<String>) -> Option<PathBuf> {

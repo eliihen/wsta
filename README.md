@@ -117,7 +117,7 @@ urls and headers saved to a file for easy reuse at a later point.
 
 If you have web services in different environments, you might for example want
 to have a `foo-dev` and `foo-prod` configuration file. This makes it easy to at
-a later date connect to `foo` by simply running `wsta -p foo-dev`,
+a later date connect to `foo` by simply running `wsta -P foo-dev`,
 
 These files could be checked into VCS and shared between colleagues.
 
