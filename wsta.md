@@ -65,7 +65,7 @@ wsta(1)                     General Commands Manual                    wsta(1)
               Print the headers of requests and responses  that  are  sent  to
               stdout,  including any and all headers of said requests. This is
               very useful for debugging why wsta is not able to connect  to  a
-              server, as you will see the response code it sent.
+              server, as you will see the response codes sent.
 
               config key: print_headers (Boolean)
 
@@ -118,13 +118,24 @@ wsta(1)                     General Commands Manual                    wsta(1)
               config key: follow_redirect (Boolean)
 
 
+       -p NAME
+              Tell  wsta  to  use  a configuration profile for this connection
+              only. The name of the profile is  the  name  of  the  folder  in
+              $XDG_CONFIG_HOME/wsta  where  the  file  that is to be loaded is
+              located.
+
+              If you want a profile to  be  used  without  -p,  use  the  file
+              $XDG_CONFIG_HOME/wsta/wsta.conf.
+
+              Also see the FILES section.
+
+
        -v, --verbose
               Make wsta more verbose. This option will print varying levels of
-              output to stdout. It can be provided up to three times in  order
+              output to stdout. It can be provided up to four times  in  order
               to  log  more  verbose  output. The first level will mostly just
-              tell you which step wsta is currently executing and provide more
-              detailed  error reports. The two other options are for debugging
-              purposes.
+              provide more detailed error reports. The other  levels  are  for
+              debugging purposes.
 
 
        -V, --version
@@ -132,21 +143,21 @@ wsta(1)                     General Commands Manual                    wsta(1)
 
 
        -h, --help
-              Shows a helpful message containing all supported  input  parame-
+              Shows  a  helpful message containing all supported input parame-
               ters, then exits.
 
 
 ## CONFIGURATION OPTIONS
-       Some  options  are not configurable as a command line argument, only as
+       Some options are not configurable as a command line argument,  only  as
        part of a configuration file. These options are listed here
 
 
        binary_frame_size
-              If used with the --binary flag, binary_frame_size  will  specify
-              the  maximum  size  of  each  binary  frame. This is a number in
-              Bytes.  If --binary is used, but this variable is not set,  then
+              If  used  with the --binary flag, binary_frame_size will specify
+              the maximum size of each binary  frame.  This  is  a  number  in
+              Bytes.   If --binary is used, but this variable is not set, then
               a default of 256 Bytes will be used.  This may be small for per-
-              sistent streaming data, and a "overrun!!!" message may show,  in
+              sistent  streaming data, and a "overrun!!!" message may show, in
               which case simply increase the fame size using this variable.
 
               config key: binary_frame_size (String)
@@ -157,30 +168,35 @@ wsta(1)                     General Commands Manual                    wsta(1)
 
 
        wsta ws://echo.websocket.org ping
-              Send  a  ping  frame to a server and see the response printed to
+              Send a ping frame to a server and see the  response  printed  to
               stdout.
 
 
        wsta -I -v ws://test.example.com
-              Show more information about an error, as  well  as  any  headers
-              send  and  received.   In this case we can see "failed to lookup
+              Show  more  information  about  an error, as well as any headers
+              send and received.  In this case we can see  "failed  to  lookup
               address", which means it is an invalid URL.
 
 
 ## FILES
-       There is the possibility to configure wsta's behavior using  configura-
-       tion  files. The options above specify what the option keys in the con-
-       figuration files are. If both a command line argument and  the  equiva-
-       lent  option  is  configured  in a configuration file, the command line
+       There  is the possibility to configure wsta's behavior using configura-
+       tion files. The options above specify what the option keys in the  con-
+       figuration  files  are. If both a command line argument and the equiva-
+       lent option is configured in a configuration  file,  the  command  line
        argument is used.
 
        Windows users can replace $XDG_CONFIG_HOME below with %APPDATA%.
+
+       $XDG_CONFIG_HOME on unix systems defaults the ~/.config directory.
 
        The syntax of the configuration files are as follows:
 
        url = "ws://echo.websocket.org";
        headers = ["Origin:google.com","Foo:Bar"];
        show_headers = true;
+
+       Where  url is a String, headers is an Array and show_headers is a Bool-
+       ean.
 
 
        $XDG_CONFIG_HOME/wsta/wsta.conf
@@ -213,4 +229,4 @@ wsta(1)                     General Commands Manual                    wsta(1)
 
 
 
-0.4.0                             11 Aug 2016                          wsta(1)
+0.4.0                             12 Aug 2016                          wsta(1)
