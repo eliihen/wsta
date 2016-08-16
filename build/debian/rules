@@ -3,15 +3,15 @@
 # Uncomment this to turn on verbose mode.
 DH_VERBOSE = 1
 DESTDIR=/usr/src/packages/BUILD/debian/wsta
-RUSTDIR=/usr/src/packages/BUILD/rust
+RUSTDIR=/usr/src/packages/BUILD/rust-toolchain
 
 build: build-wsta
 build-wsta:
 	dh_testdir
-	mkdir -pv rust-beta
-	tar -xzf rust-beta-$(DEB_TARGET_GNU_CPU)-unknown-linux-gnu.tar.gz -C rust-beta --strip-components 1
+	mkdir -pv rust
+	tar -xzf rust-1.*-$(DEB_TARGET_GNU_CPU)-unknown-linux-gnu.tar.gz -C rust --strip-components 1
 	mkdir -pv $(RUSTDIR) $(DESTDIR)
-	sh rust-beta/install.sh --without="rust-docs" --prefix="$(RUSTDIR)" --disable-ldconfig
+	sh rust/install.sh --without="rust-docs" --prefix="$(RUSTDIR)" --disable-ldconfig
 	PATH=$(PATH):$(RUSTDIR)/bin CARGO_HOME=$(PWD)/.cargo cargo build --release
 
 install:
@@ -22,7 +22,7 @@ install:
 clean:
 	dh_testdir
 	dh_testroot
-	rm -rf target rust-beta wsta
+	rm -rf target rust wsta
 	dh_clean
 
 # Build architecture-independent files here.
@@ -55,9 +55,6 @@ binary-arch: build install
 #	dh_installdeb
 #	dh_perl
 #	dh_shlibdeps
-	ls -la .
-	ls -la ..
-	ls -la debian
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb
