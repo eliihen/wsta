@@ -151,6 +151,12 @@ Service pipeline, which is what creates the releases on that page. For now, you
 need a 64-bit system to use that page. If you don't use a 64-bit system, have a
 look below at binaries or compiling it yourself.
 
+### Gentoo Linux
+`wsta` can be found in the Gentoo portage tree as `dev-util/wsta`. In order to
+install it, simply run the following command.
+
+    emerge dev-util/wsta
+
 ### Mac OS X
 To install on Max OS X, ensure you have [homebrew](http://brew.sh) installed,
 then run the following commands. It's going to take a while, please be patient.
