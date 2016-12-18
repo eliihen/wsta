@@ -123,7 +123,8 @@ pub fn read_stdin_buffer(sender: &mut SenderObj<WebSocketStream>,
 pub fn check_ping_interval(ping_interval: &Option<Duration>,
                            last_time: SystemTime,
                            sender: &mut SenderObj<WebSocketStream>,
-                           echo: bool) -> SystemTime {
+                           echo: bool,
+                           ping_msg: &String) -> SystemTime {
 
     if ping_interval.is_some() {
         let now = SystemTime::now();
@@ -131,10 +132,10 @@ pub fn check_ping_interval(ping_interval: &Option<Duration>,
 
         if time_passed >= ping_interval.unwrap().as_secs() {
             if echo {
-                println!("> ping");
+                println!("> {}", ping_msg);
             }
 
-            let frame = Message::text("ping");
+            let frame = Message::text(format!("{}", ping_msg));
             match sender.send_message(&frame) {
                 Err(err) => {
                     log!(1, "Error object: {:?}", err);

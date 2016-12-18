@@ -80,11 +80,17 @@ config key: print_headers (Boolean)
 
 .TP
 .B \-p, \-\-ping SECONDS
-Send "ping" frames to the server every
+Send a ping frame to the server every
 .B SECONDS
 seconds. This is helpful if you want to have a an automated script with a
 constant connection to the server without getting disconnected, for example to
 monitor uptime.
+
+.TP
+.B \-\-ping\-msg MESSAGE
+Specify the message to send when pinging the server.
+
+config key: ping_string (String)
 
 .TP
 .B \-e, \-\-echo

@@ -44,6 +44,9 @@ pub struct Options {
     /// frame to the server.
     pub ping_interval: Option<u64>,
 
+    /// The string to send to the server when sending a ping frame.
+    pub ping_msg: String,
+
     /// If provided, will turn the program into a binary mode, reading 255 bytes
     /// at a time and sending frames when the buffer is filled
     pub binary_mode: bool,
@@ -66,6 +69,7 @@ impl Options {
             headers: Vec::new(),
             messages: Vec::new(),
             ping_interval: None,
+            ping_msg: String::from("ping"),
             binary_mode: false,
             binary_frame_size: String::from("256")
         }
@@ -84,6 +88,7 @@ impl Options {
             headers: get_vec(config, "headers"),
             messages: get_vec(config, "messages"),
             ping_interval: None,
+            ping_msg: get_str_or(config, "ping_msg", "ping"),
             binary_mode: get_bool(config, "binary_mode"),
             // TODO Make int
             binary_frame_size: get_str_or(config, "binary_frame_size", "256"),

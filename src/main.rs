@@ -98,7 +98,12 @@ fn main() {
         ap.refer(&mut options.ping_interval)
             .metavar("SECONDS")
             .add_option(&["-p", "--ping"], StoreOption,
-                        "specify an interval to send `ping` to the server");
+                        "specify an interval to send a ping to the server");
+
+        ap.refer(&mut options.ping_msg)
+            .metavar("MESSAGE")
+            .add_option(&["--ping-msg"], Store,
+                        "specify a message to to send when pinging the server");
 
         ap.refer(&mut options.login_url)
             .add_option(&["-l", "--login"], Store,

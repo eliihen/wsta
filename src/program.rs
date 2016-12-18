@@ -146,7 +146,8 @@ pub fn run_wsta(options: &mut Options) {
 
         // Check if ping_interval has passed, if so, send a ping frame
         last_time = ws::check_ping_interval(&ping_interval, last_time,
-                                            &mut sender, options.echo);
+                                            &mut sender, options.echo,
+                                            &options.ping_msg);
 
         // Sleep for 0.25 seconds at a time, to give the processor some rest.
         // Should be a multiple of 1 second as this is the smallest possible

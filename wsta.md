@@ -71,10 +71,16 @@ wsta(1)                     General Commands Manual                    wsta(1)
 
 
        -p, --ping SECONDS
-              Send  "ping" frames to the server every SECONDS seconds. This is
+              Send  a  ping frame to the server every SECONDS seconds. This is
               helpful if you want to have a an automated script  with  a  con-
               stant connection to the server without getting disconnected, for
               example to monitor uptime.
+
+
+       --ping-msg MESSAGE
+              Specify the message to send when pinging the server.
+
+              config key: ping_string (String)
 
 
        -e, --echo
