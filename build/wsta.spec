@@ -1,5 +1,5 @@
 Name:           wsta
-Version:        0.4.1
+Version:        0.5.0
 Release:        1%{?dist}
 Summary:        The WebSocket Transfer Agent
 
@@ -49,6 +49,8 @@ cp -v wsta.1 $RPM_BUILD_ROOT/usr/local/share/man/man1/wsta.1
 
 
 %changelog
+* Sun Dec 18 2016 Espen Henriksen <dev+wsta@henriksen.is>
+- Add support for setting custom ping message
 * Fri Aug 12 2016 Espen Henriksen <dev+wsta@henriksen.is>
 - Fix argument conflict - profile argument -p is now -P
 * Thu Aug 11 2016 Espen Henriksen <dev+wsta@henriksen.is>
