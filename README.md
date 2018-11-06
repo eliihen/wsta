@@ -60,8 +60,6 @@ the connection alive, and check the exit code for issues. You can also send
 the last few messages with POST data for a higher quality alert.
 
 ```bash
-#!/bin/bash
-
 while true; do
 
   # Start persistent connection, pinging evey 10 seconds to stay alive
@@ -82,12 +80,10 @@ possible. This example could also be ran in parallel as many times as required
 to add more saturated connections to the load test.
 
 ```bash
-#!/bin/bash
-
 for i in {1..1000}
 do
-  echo subscribe?giveMeLotsOfData=true&id=$i
-  echo unsubscribe?id=$i
+  echo "subscribe?giveMeLotsOfData=true&id=$i"
+  echo "unsubscribe?id=$i"
 done | wsta ws://echo.websocket.org
 ```
 
